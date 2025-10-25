@@ -8,28 +8,14 @@ public class Booking
   [BsonId]
   [BsonRepresentation(MongoDB.Bson.BsonType.ObjectId)]
   public string? Id { get; set; }
-
   public string CarId { get; set; } = null!;
-
-  public decimal BookingAmount { get; set; }
-
-  public bool IsRefunded { get; set; }
-
-  public string BookingStatus { get; set; } = string.Empty;
-
-  public string DeliveryStatus { get; set; } = string.Empty;
-
-  public DateTime? DeliveryDate { get; set; }
-
-  public string Location { get; set; } = string.Empty;
-
-  public Document Documents { get; set; } = new Document();
-
-  public DateTime? NextServiceDate { get; set; }
-
-  public string Warranty { get; set; } = string.Empty;
-
-  public Specs Specs { get; set; } = new Specs();
-
-  public DateTime BookedAt { get; set; } = DateTime.UtcNow;
+  public string Name { get; set; } = string.Empty;
+  public string Phone { get; set; } = string.Empty;
+  public string Email { get; set; } = string.Empty;
+  public string Address { get; set; } = string.Empty;
+  public string PreferredDate { get; set; } = string.Empty;
+  public string PreferredTime { get; set; } = string.Empty;
+  public string PaymentMethod { get; set; } = string.Empty;
+  public string LoanRequired { get; set; } = string.Empty;
+  public string DownPayment { get; set; } = string.Empty;
 }

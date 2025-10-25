@@ -121,6 +121,7 @@ const PurchasedCarsPage = () => {
         if (user) {
           const car = await getBookingByUser(user?.id);
           setpurchasedCars(car);
+          console.log(JSON.stringify(car, null, 2));
         }
       } catch (error) {
         console.error(error);
@@ -140,11 +141,13 @@ const PurchasedCarsPage = () => {
   }
   if (!purchasedCars) {
     return (
-      <div className="text-center mt-10 text-red-500">Boooking not found.</div>
+      <div className="text-center mt-10 text-red-500">Booking not found.</div>
     );
   }
+
   const formatPrice = (price: string) => {
-    return "₹ " + parseInt(price).toLocaleString("en-IN");
+    const numericPrice = Number(price.replace(/,/g, ""));
+    return "₹ " + numericPrice.toLocaleString("en-IN");
   };
 
   return (
@@ -215,7 +218,7 @@ const PurchasedCarsPage = () => {
                       <div className="bg-amber-50 p-3 rounded-lg">
                         <p className="text-sm text-amber-700">EMI from</p>
                         <p className="text-xl font-bold text-amber-900">
-                          ₹ {parseInt(data.car.emi).toLocaleString("en-IN")}
+                          {formatPrice(data.car.emi)}
                           /month
                         </p>
                       </div>
@@ -395,7 +398,9 @@ const PurchasedCarsPage = () => {
                     <Landmark className="w-5 h-5 mr-3 text-blue-600" />
                     <div>
                       <p className="text-sm text-gray-500">Financing</p>
-                      <p className="text-gray-800 font-medium">{data.booking.loanStatus}</p>
+                      <p className="text-gray-800 font-medium">
+                        {data.booking.loanStatus}
+                      </p>
                     </div>
                   </div>
                 </div>
