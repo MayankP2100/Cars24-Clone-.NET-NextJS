@@ -23,14 +23,23 @@ public class BookingController(BookingService bookingService, UserService userSe
 
     await bookingService.CreateBookingAsync(booking);
 
-    var user = await userService.GetUserByIdAsync(userId);
+    if (string.IsNullOrEmpty(booking.Id))
+    {
+      return BadRequest("Booking ID is null or empty after creation.");
+    }
 
+    var user = await userService.GetUserByIdAsync(userId);
     if (user == null) return NotFound("User not found.");
 
-    user.BookingId.Add(booking.Id!);
-    await userService.UpdateUserAsync(userId, user);
+    if (user.BookingId == null)
+    {
+      user.BookingId = new List<string>();
+    }
 
-    return CreatedAtAction(nameof(GetBookingById), new { id = booking.Id }, booking);
+    user.BookingId.Add(booking.Id);
+    await userService.UpdateUserAsync(user.Id!, user);
+
+    return CreatedAtAction(nameof(GetBookingById), new { id = booking.Id }, new { booking, booking.CarId });
   }
 
   [HttpGet("{id}")]
@@ -51,17 +60,24 @@ public class BookingController(BookingService bookingService, UserService userSe
 
     var results = new List<BookingDto>();
 
+    if (user.BookingId == null)
+    {
+      user.BookingId = new List<string>();
+    }
+
+    if (user.BookingId.Count == 0)
+    {
+      return Ok(results);
+    }
+
+    var validBookingIds = new List<string>();
     foreach (var bookingId in user.BookingId)
     {
       var booking = await bookingService.GetBookingByIdAsync(bookingId);
-      if (booking != null)
+      if (booking != null && booking.CarId != null)
       {
-        Car? car = null;
-        if (!string.IsNullOrEmpty(booking.CarId))
-        {
-          car = await carService.GetCarByIdAsync(booking.CarId);
-        }
-
+        validBookingIds.Add(bookingId);
+        var car = await carService.GetCarByIdAsync(booking.CarId);
         results.Add(new BookingDto
         {
           Booking = booking,
@@ -69,6 +85,10 @@ public class BookingController(BookingService bookingService, UserService userSe
         });
       }
     }
+
+    user.BookingId = validBookingIds;
+    await userService.UpdateUserAsync(user.Id!, user);
+
     return Ok(results);
   }
 }

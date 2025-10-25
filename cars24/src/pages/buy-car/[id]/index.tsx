@@ -5,6 +5,7 @@ import {
 } from "@/components/ui/carousel";
 import { Input } from "@/components/ui/input";
 import { useAuth } from "@/context/AuthContext";
+import { createBooking } from "@/lib/bookingapi";
 import { getCarById } from "@/lib/carapi";
 import {
   AlertCircle,
@@ -126,11 +127,11 @@ const index = () => {
         loanRequired: formData.loanRequired,
         downPayment: formData.downPayment,
       };
-      // const response = await createBooking(user.id, booking);
-      // if (response.id) {
-      //   toast.success("Bookings listed Successfully");
-      //   router.push(`/bookings`);
-      // }
+      const response = await createBooking(user.id, booking);
+      if (response.id) {
+        toast.success("Bookings listed Successfully");
+        router.push(`/bookings`);
+      }
     } catch (error) {}
   };
 
