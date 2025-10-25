@@ -1,20 +1,31 @@
-import { Bell, Calendar, Car, LogOut, Mail, Settings, User } from "lucide-react";
+import { useAuth } from "@/context/AuthContext";
+import {
+  Bell,
+  Calendar,
+  Car,
+  LogOut,
+  Mail,
+  Settings,
+  User,
+} from "lucide-react";
 import { useRouter } from "next/router";
 import React, { useState } from "react";
 
 const index = () => {
-  const user = {
-    id: "1",
-    avatar_url: "https://github.com/shadcn.png",
-    email: "abc@gmail.com",
-    full_name: "John Doe",
-    phone: "+1234567890",
-    created_at: new Date().toISOString(),
-  };
+  // const user = {
+  //   id: "1",
+  //   avatar_url: "https://github.com/shadcn.png",
+  //   email: "abc@gmail.com",
+  //   full_name: "John Doe",
+  //   phone: "+1234567890",
+  //   created_at: new Date().toISOString(),
+  // };
+
+  const { user } = useAuth();
   const router = useRouter();
 
   return (
-     <div className="min-h-screen bg-gray-50 text-black">
+    <div className="min-h-screen bg-gray-50 text-black">
       <main className="container mx-auto px-4 py-8">
         <div className="max-w-4xl mx-auto">
           <div className="bg-white rounded-lg shadow-md overflow-hidden">
@@ -26,7 +37,7 @@ const index = () => {
                 </div>
                 <div>
                   <h1 className="text-2xl font-bold text-white">
-                    {user?.full_name}
+                    {user?.fullName}
                   </h1>
                   <p className="text-blue-100">{user?.email}</p>
                 </div>
@@ -47,7 +58,7 @@ const index = () => {
                       <div className="flex items-center space-x-2">
                         <User className="w-5 h-5 text-gray-400" />
                         <span className="text-gray-600">Full Name:</span>
-                        <span className="font-medium">{user?.full_name}</span>
+                        <span className="font-medium">{user?.fullName}</span>
                       </div>
                       <div className="flex items-center space-x-2">
                         <Mail className="w-5 h-5 text-gray-400" />
@@ -88,9 +99,7 @@ const index = () => {
                       <span>Appointments</span>
                     </button>
 
-                    <button
-                      className="w-full flex items-center space-x-2 p-3 text-left rounded-lg hover:bg-gray-50 text-red-600"
-                    >
+                    <button className="w-full flex items-center space-x-2 p-3 text-left rounded-lg hover:bg-gray-50 text-red-600">
                       <LogOut className="w-5 h-5" />
                       <span>Sign Out</span>
                     </button>

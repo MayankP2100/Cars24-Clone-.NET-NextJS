@@ -64,7 +64,7 @@ export default function CustomerReviews() {
           </div>
         </div>
         
-        <div className="max-w-4xl mx-auto relative">
+        <div className="max-w-4xl w-full mx-auto relative">
           <div className="flex overflow-hidden">
             {reviews.map((review, index) => (
               <div 
