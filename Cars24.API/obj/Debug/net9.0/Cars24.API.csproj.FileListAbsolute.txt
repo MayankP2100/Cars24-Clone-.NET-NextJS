@@ -37,3 +37,4 @@ D:\Programming\Webs\cars24-training\cars24.api\bin\Debug\net9.0\SharpCompress.dl
 D:\Programming\Webs\cars24-training\cars24.api\bin\Debug\net9.0\Snappier.dll
 D:\Programming\Webs\cars24-training\cars24.api\bin\Debug\net9.0\ZstdSharp.dll
 D:\Programming\Webs\cars24-training\Cars24.api\bin\Debug\net9.0\BCrypt.Net-Next.dll
+D:\Programming\Webs\cars24-training\Cars24.API\obj\Debug\net9.0\Cars24.API.sourcelink.json
