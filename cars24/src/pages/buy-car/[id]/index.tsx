@@ -1,60 +1,15 @@
-import {
-  Carousel,
-  CarouselContent,
-  CarouselItem,
-} from "@/components/ui/carousel";
-import { Input } from "@/components/ui/input";
-import { useAuth } from "@/context/AuthContext";
-import { createBooking } from "@/lib/bookingapi";
-import { getCarById } from "@/lib/carapi";
-import {
-  AlertCircle,
-  Calendar,
-  Clock,
-  CreditCard,
-  MapPin,
-  Phone,
-  User,
-} from "lucide-react";
-import { useRouter } from "next/router";
-import React, { useEffect, useState } from "react";
-import { toast } from "sonner";
-const carDetails = {
-  id: "fronx-2023",
-  title: "2023 Maruti FRONX DELTA PLUS 1.2L AGS",
-  images: [
-    "https://images.pexels.com/photos/170811/pexels-photo-170811.jpeg",
-    "https://images.pexels.com/photos/116675/pexels-photo-116675.jpeg",
-    "https://images.pexels.com/photos/3729464/pexels-photo-3729464.jpeg",
-  ],
-  price: "₹7.80 lakh",
-  emi: "₹15,245/month",
-  location: "Metro Walk, Rohini, New Delhi",
-  specs: {
-    year: 2023,
-    km: "10,048",
-    fuel: "Petrol",
-    transmission: "Automatic",
-    owner: "1st owner",
-    insurance: "Valid till 2024",
-  },
-  features: [
-    "Power Steering",
-    "Power Windows",
-    "Air Conditioning",
-    "Driver Airbag",
-    "Passenger Airbag",
-    "Alloy Wheels",
-  ],
-  highlights: [
-    "Single owner vehicle",
-    "All original documents",
-    "Non-accidental",
-    "Fully maintained",
-  ],
-};
+import {Carousel, CarouselContent, CarouselItem,} from "@/components/ui/carousel";
+import {Input} from "@/components/ui/input";
+import {useAuth} from "@/context/AuthContext";
+import {createBooking} from "@/lib/bookingapi";
+import {getCarById} from "@/lib/carapi";
+import {AlertCircle, Calendar, Clock, CreditCard, MapPin, Phone, User,} from "lucide-react";
+import {useRouter} from "next/router";
+import React, {useEffect, useState} from "react";
+import {toast} from "sonner";
+
 const index = () => {
-  const [formData, setformData] = useState({
+  const [formData, setFormData] = useState({
     name: "",
     phone: "",
     email: "",
@@ -66,28 +21,30 @@ const index = () => {
     downPayment: "",
   });
   const router = useRouter();
-  const { id } = router.query;
-  const [carDetails, setcarDetails] = useState<any>(null);
+  const {id} = router.query;
+  const [carDetails, setCarDetails] = useState<any>(null);
   const [loading, setLoading] = useState(true);
-  const [step, setstep] = useState(1);
+  const [step, setStep] = useState(1);
   useEffect(() => {
     if (!id) return;
+
     async function fetchCar() {
       try {
         const data = await getCarById(id as string);
-        setcarDetails(data);
+        setCarDetails(data);
       } catch (error) {
         console.error(error);
       } finally {
         setLoading(false);
       }
     }
-    fetchCar();
+
+    fetchCar().then();
   }, [id]);
   if (loading) {
     return (
       <div className="flex justify-center items-center min-h-screen">
-        <div className="animate-spin rounded-full h-10 w-10 border-t-2 border-b-2 border-gray-900" />
+        <div className="animate-spin rounded-full h-10 w-10 border-t-2 border-b-2 border-gray-900"/>
       </div>
     );
   }
@@ -101,17 +58,17 @@ const index = () => {
   const handleInputChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
   ) => {
-    const { name, value } = e.target;
-    setformData((Prev) => ({
+    const {name, value} = e.target;
+    setFormData((Prev) => ({
       ...Prev,
       [name]: value,
     }));
   };
-  const { user } = useAuth();
-  const handlesubmit = async (e: React.FormEvent) => {
+  const {user} = useAuth();
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!user) {
-      toast.error("Pleasde login to continue");
+      toast.error("Please login to continue");
       return;
     }
     try {
@@ -130,12 +87,13 @@ const index = () => {
       const response = await createBooking(user.id, booking);
       if (response.id) {
         toast.success("Bookings listed Successfully");
-        router.push(`/bookings`);
+        await router.push(`/bookings`);
       }
-    } catch (error) {}
+    } catch (error) {
+    }
   };
 
-  const validatestep = () => {
+  const validateStep = () => {
     if (step === 1) {
       return formData.name && formData.phone && formData.email;
     }
@@ -163,7 +121,7 @@ const index = () => {
               {/* Car Image */}
               <Carousel className="w-full">
                 <CarouselContent>
-                  {Array.from({ length: carDetails.images.length }).map(
+                  {Array.from({length: carDetails.images.length}).map(
                     (_, index) => (
                       <CarouselItem
                         key={index}
@@ -220,6 +178,20 @@ const index = () => {
                   <p className="text-gray-600">Insurance</p>
                   <p className="font-medium">{carDetails.specs.insurance}</p>
                 </div>
+                {
+                  carDetails.estimatedMonthlyMaintenanceCost !== 0 &&
+                    <div className="bg-gray-50 p-3 rounded-lg">
+                        <p className="text-gray-600">Estimated maintenance cost</p>
+                        <p className="font-medium">₹{carDetails.estimatedMonthlyMaintenanceCost}/mo</p>
+                    </div>
+                }
+
+                {
+                  carDetails.tag &&
+                    <div className="bg-blue-100 text-blue-800 px-3 py-1.5 rounded-lg w-fit">
+                      {carDetails.tag}
+                    </div>
+                }
               </div>
               {/* Highlights */}
               <div className="bg-blue-50 p-4 rounded-lg mb-4">
@@ -260,8 +232,8 @@ const index = () => {
                           step === stepNumber
                             ? "bg-blue-600 text-white"
                             : step > stepNumber
-                            ? "bg-green-500 text-white"
-                            : "bg-gray-200 text-gray-600"
+                              ? "bg-green-500 text-white"
+                              : "bg-gray-200 text-gray-600"
                         }`}
                       >
                         {step > stepNumber ? "✓" : stepNumber}
@@ -277,12 +249,12 @@ const index = () => {
                   ))}
                 </div>
               </div>
-              <form onSubmit={handlesubmit} className="space-y-6">
+              <form onSubmit={handleSubmit} className="space-y-6">
                 {step === 1 && (
                   <div className="space-y-4">
                     <div>
                       <label className="block text-sm font-medium text-gray-700 mb-1">
-                        <User className="w-4 h-4 inline mr-1" /> Full Name
+                        <User className="w-4 h-4 inline mr-1"/> Full Name
                       </label>
                       <input
                         type="text"
@@ -295,7 +267,7 @@ const index = () => {
                     </div>
                     <div>
                       <label className="block text-sm font-medium text-gray-700 mb-1">
-                        <Phone className="w-4 h-4 inline mr-1" /> Phone Number
+                        <Phone className="w-4 h-4 inline mr-1"/> Phone Number
                       </label>
                       <input
                         type="tel"
@@ -325,7 +297,7 @@ const index = () => {
                   <div className="space-y-4">
                     <div>
                       <label className="block text-sm font-medium text-gray-700 mb-1">
-                        <Calendar className="w-4 h-4 inline mr-1" /> Preferred
+                        <Calendar className="w-4 h-4 inline mr-1"/> Preferred
                         Visit Date
                       </label>
                       <Input
@@ -339,7 +311,7 @@ const index = () => {
                     </div>
                     <div>
                       <label className="block text-sm font-medium text-gray-700 mb-1">
-                        <Clock className="w-4 h-4 inline mr-1" /> Preferred Time
+                        <Clock className="w-4 h-4 inline mr-1"/> Preferred Time
                       </label>
                       <select
                         name="preferredTime"
@@ -358,7 +330,7 @@ const index = () => {
                     </div>
                     <div>
                       <label className="block text-sm font-medium text-gray-700 mb-1">
-                        <MapPin className="w-4 h-4 inline mr-1" /> Address
+                        <MapPin className="w-4 h-4 inline mr-1"/> Address
                       </label>
                       <input
                         type="text"
@@ -375,7 +347,7 @@ const index = () => {
                   <div className="space-y-4">
                     <div>
                       <label className="block text-sm font-medium text-gray-700 mb-1">
-                        <CreditCard className="w-4 h-4 inline mr-1" /> Payment
+                        <CreditCard className="w-4 h-4 inline mr-1"/> Payment
                         Method
                       </label>
                       <select
@@ -408,7 +380,7 @@ const index = () => {
 
                     <div className="bg-yellow-50 p-4 rounded-lg">
                       <div className="flex items-start">
-                        <AlertCircle className="w-5 h-5 text-yellow-600 mt-0.5 mr-2" />
+                        <AlertCircle className="w-5 h-5 text-yellow-600 mt-0.5 mr-2"/>
                         <div>
                           <h4 className="text-sm font-medium text-yellow-800">
                             Required Documents
@@ -428,7 +400,7 @@ const index = () => {
                   {step > 1 && (
                     <button
                       type="button"
-                      onClick={() => setstep(step - 1)}
+                      onClick={() => setStep(step - 1)}
                       className="px-4 py-2 text-gray-600 border border-gray-300 rounded-md hover:bg-gray-50"
                     >
                       Back
@@ -438,13 +410,13 @@ const index = () => {
                   {step < 3 ? (
                     <button
                       type="button"
-                      onClick={() => validatestep() && setstep(step + 1)}
+                      onClick={() => validateStep() && setStep(step + 1)}
                       className={`px-6 py-2 rounded-md text-white ${
-                        validatestep()
+                        validateStep()
                           ? "bg-blue-600 hover:bg-blue-700"
                           : "bg-gray-400 cursor-not-allowed"
                       }`}
-                      disabled={!validatestep()}
+                      disabled={!validateStep()}
                     >
                       Continue
                     </button>

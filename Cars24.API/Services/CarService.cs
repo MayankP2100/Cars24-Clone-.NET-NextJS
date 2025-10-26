@@ -1,6 +1,7 @@
+using Cars24.API.Models;
 using MongoDB.Driver;
 
-namespace Cars24API.Services;
+namespace Cars24.API.Services;
 
 public class CarService
 {
@@ -18,5 +19,5 @@ public class CarService
 
   public async Task<Car?> GetCarByIdAsync(string id) => await _cars.Find(car => car.Id == id).FirstOrDefaultAsync();
 
-  public async Task createCarAsync(Car car) => await _cars.InsertOneAsync(car);
+  public async Task CreateCarAsync(Car car) => await _cars.InsertOneAsync(car);
 }

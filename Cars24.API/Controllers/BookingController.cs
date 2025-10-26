@@ -1,8 +1,8 @@
-using Cars24API.Models;
-using Cars24API.Services;
+using Cars24.API.Models;
+using Cars24.API.Services;
 using Microsoft.AspNetCore.Mvc;
 
-namespace Cars24API.Controllers;
+namespace Cars24.API.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]

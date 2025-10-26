@@ -19,20 +19,6 @@ const AppointmentsPage = () => {
   //     appointmentType: 'branch_visit',
   //     status: 'upcoming',
   //     notes: 'Please bring all required documents for inspection'
-  //   },
-  //   {
-  //     id: '2',
-  //     car: {
-  //       id: 'car2',
-  //       title: 'Hyundai i20 2019 Asta',
-  //       image: 'https://images.pexels.com/photos/116675/pexels-photo-116675.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2'
-  //     },
-  //     scheduledDate: '2024-03-10',
-  //     scheduledTime: '2:30 PM',
-  //     location: 'Connaught Place, New Delhi',
-  //     appointmentType: 'home_inspection',
-  //     status: 'completed',
-  //     notes: 'Car inspection completed successfully'
   //   }
   // ];
 
@@ -56,7 +42,7 @@ const AppointmentsPage = () => {
   const [loading, setLoading] = useState(true);
   const [appointments, setAppointments] = useState<any>(null);
   useEffect(() => {
-    const fetchappointments = async () => {
+    const fetchAppointments = async () => {
       try {
         if (user) {
           const car = await getAppointmentByUser(user?.id);
@@ -69,7 +55,7 @@ const AppointmentsPage = () => {
       }
     };
 
-    fetchappointments();
+    fetchAppointments().then();
   }, [user]);
   if (loading) {
     return (

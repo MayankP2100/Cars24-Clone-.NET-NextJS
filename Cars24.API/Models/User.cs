@@ -2,7 +2,7 @@ using System.ComponentModel.DataAnnotations;
 using MongoDB.Bson;
 using MongoDB.Bson.Serialization.Attributes;
 
-namespace Cars24API.Models;
+namespace Cars24.API.Models;
 
 public class User
 {

@@ -1,7 +1,6 @@
-using System.Reflection.Metadata;
 using MongoDB.Bson.Serialization.Attributes;
 
-namespace Cars24API.Models;
+namespace Cars24.API.Models;
 
 public class Booking
 {

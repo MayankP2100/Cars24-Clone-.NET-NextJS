@@ -1,29 +1,17 @@
-using Cars24API.Models;
-using Cars24API.Services;
+using Cars24.API.Models;
+using Cars24.API.Services;
 using Microsoft.AspNetCore.Mvc;
 
-namespace Cars24API.Controllers;
+namespace Cars24.API.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
-public class UserAuthController : ControllerBase
+public class UserAuthController(UserService userService) : ControllerBase
 {
-  private readonly UserService _userService;
-
-  public UserAuthController(UserService userService)
-  {
-    _userService = userService;
-  }
-
   [HttpGet("{id}")]
   public async Task<IActionResult> GetUserById(string id)
   {
-    var user = await _userService.GetUserByIdAsync(id);
-
-    if (user == null)
-    {
-      return NotFound("User not found.");
-    }
+    var user = await userService.GetUserByIdAsync(id);
 
     return Ok(user);
   }
@@ -33,7 +21,7 @@ public class UserAuthController : ControllerBase
   {
     user.Id = null;
 
-    var existingUser = await _userService.GetUsernameByEmailAsync(user.Email);
+    var existingUser = await userService.GetUsernameByEmailAsync(user.Email);
 
     if (existingUser != null)
     {
@@ -42,7 +30,7 @@ public class UserAuthController : ControllerBase
 
     user.Password = BCrypt.Net.BCrypt.HashPassword(user.Password);
 
-    await _userService.CreateUserAsync(user);
+    await userService.CreateUserAsync(user);
 
     return Ok(new
     {
@@ -60,7 +48,7 @@ public class UserAuthController : ControllerBase
   [HttpPost("login")]
   public async Task<IActionResult> LogIn([FromBody] LoginRequest request)
   {
-    var user = await _userService.GetUsernameByEmailAsync(request.Email);
+    var user = await userService.GetUsernameByEmailAsync(request.Email);
 
     if (user == null)
     {

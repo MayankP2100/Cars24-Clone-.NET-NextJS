@@ -1,7 +1,7 @@
-using Cars24API.Models;
+using Cars24.API.Models;
 using MongoDB.Driver;
 
-namespace Cars24API.Services;
+namespace Cars24.API.Services;
 
 public class AppointmentService
 {

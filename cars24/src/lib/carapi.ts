@@ -1,4 +1,4 @@
-import { BASE_URL } from "./utils";
+import {BASE_URL} from "./utils";
 
 type CarDetails = {
   emi: string;
@@ -35,6 +35,5 @@ export const getCarById = async (id: string) => {
 
 export const getCarSummaries = async () => {
   const res = await fetch(`${BASE_URL}/api/cars`);
-
   return res.json();
 };
