@@ -18,6 +18,17 @@ public class Specs
     public string Insurance { get; set; } = Empty;
 }
 
+public class MaintenanceInsights
+{
+    public int MonthlyMaintenanceCost { get; set; }
+
+    public string ServiceInsight { get; set; } = Empty;
+
+    public string TireInsight { get; set; } = Empty;
+
+    public string BatteryInsight { get; set; } = Empty;
+}
+
 public class Car
 {
     [BsonId]
@@ -42,5 +53,5 @@ public class Car
 
     public string Tag { get; set; } = Empty;
 
-    public double EstimatedMonthlyMaintenanceCost { get; set; } = 0;
+    public MaintenanceInsights MaintenanceInsights { get; set; } = new MaintenanceInsights();
 }

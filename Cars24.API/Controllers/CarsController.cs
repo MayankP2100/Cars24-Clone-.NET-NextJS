@@ -34,14 +34,17 @@ public class CarsController(CarService carService) : ControllerBase
             return BadRequest("Car data is required.");
         }
 
-        var brand = _avgMaintenanceCost.Keys
+        var brand = _brandSpecs.Keys
             .FirstOrDefault(b => car.Title.Contains(b, StringComparison.CurrentCultureIgnoreCase));
 
-        var baseMaintenanceCost = 0;
-        if (brand != null && _avgMaintenanceCost.TryGetValue(brand, out var value))
-        {
-            baseMaintenanceCost = value;
-        }
+        var spec = brand != null && _brandSpecs.TryGetValue(brand, out var foundSpec)
+            ? foundSpec
+            : new BrandMaintenanceSpec
+            {
+                MaintenanceCost = 0, ServiceIntervalKm = 10000, TireReplacementKm = 40000, BatteryReplacementYears = 4
+            };
+
+        var baseMaintenanceCost = spec.MaintenanceCost;
 
         var carAge = DateTime.Now.Year - car.Specs.Year;
 
@@ -75,57 +78,370 @@ public class CarsController(CarService carService) : ControllerBase
             _ => "High Maintenance Expected",
         };
 
+        var nextServiceKm = ((kms / spec.ServiceIntervalKm) + 1) * spec.ServiceIntervalKm;
+        car.MaintenanceInsights.ServiceInsight = $"Next major service due in {nextServiceKm - kms:n0} km";
+
+        car.MaintenanceInsights.TireInsight = kms >= spec.TireReplacementKm
+            ? "Tire replacement recommended soon"
+            : $"Tire replacement likely after {spec.TireReplacementKm - kms:n0} km";
+
+        car.MaintenanceInsights.BatteryInsight = carAge >= spec.BatteryReplacementYears
+            ? "Check battery health - possible replacement needed soon"
+            : $"Battery typically replaced after {spec.BatteryReplacementYears - carAge} years";
+
         car.Tag = tag;
-        car.EstimatedMonthlyMaintenanceCost = estimatedMonthly;
+        car.MaintenanceInsights.MonthlyMaintenanceCost = (int)estimatedMonthly;
 
         await carService.CreateCarAsync(car);
 
         return CreatedAtAction(nameof(GetCarById), new { id = car.Id }, car);
     }
 
-    private readonly Dictionary<string, int> _avgMaintenanceCost = new()
+    private class BrandMaintenanceSpec
     {
-        { "Maruti", 6000 },
-        { "Suzuki", 6000 },
-        { "Tata", 7000 },
-        { "Hyundai", 8000 },
-        { "Mahindra", 8500 },
-        { "Honda", 7500 },
-        { "Toyota", 7500 },
-        { "Kia", 8500 },
-        { "Ford", 9500 },
-        { "Skoda", 9500 },
-        { "Volkswagen", 10000 },
-        { "Nissan", 7000 },
-        { "Renault", 7500 },
-        { "MG", 9000 },
-        { "Jeep", 13000 },
-        { "BMW", 116000 },
-        { "Mercedes", 109000 },
-        { "Mercedes-Benz", 109000 },
-        { "Audi", 118000 },
-        { "Jaguar", 160000 },
-        { "Land Rover", 170000 },
-        { "Volvo", 110000 },
-        { "Lexus", 80000 },
-        { "Mini", 122000 },
-        { "Porsche", 170000 },
-        { "Tesla", 120000 },
-        { "Maserati", 143000 },
-        { "Chevrolet", 8500 },
-        { "Fiat", 8000 },
-        { "Mitsubishi", 10000 },
-        { "Subaru", 9000 },
-        { "Datsun", 7000 },
-        { "Buick", 87300 },
-        { "Acura", 71900 },
-        { "Cadillac", 112400 },
-        { "Infiniti", 91600 },
-        { "Mazda", 66300 },
-        { "Chrysler", 87300 },
-        { "Dodge", 91000 },
-        { "Ram", 99200 },
-        { "Genesis", 75200 },
-        { "Lincoln", 126200 },
+        public int MaintenanceCost { get; set; }
+        public int ServiceIntervalKm { get; set; }
+        public int TireReplacementKm { get; set; }
+        public int BatteryReplacementYears { get; set; }
+    }
+
+    private readonly Dictionary<string, BrandMaintenanceSpec> _brandSpecs = new()
+    {
+        {
+            "Maruti",
+            new BrandMaintenanceSpec
+            {
+                MaintenanceCost = 6000, ServiceIntervalKm = 10000, TireReplacementKm = 45000,
+                BatteryReplacementYears = 4
+            }
+        },
+        {
+            "Suzuki",
+            new BrandMaintenanceSpec
+            {
+                MaintenanceCost = 6000, ServiceIntervalKm = 10000, TireReplacementKm = 45000,
+                BatteryReplacementYears = 4
+            }
+        },
+        {
+            "Tata",
+            new BrandMaintenanceSpec
+            {
+                MaintenanceCost = 7000, ServiceIntervalKm = 10000, TireReplacementKm = 45000,
+                BatteryReplacementYears = 4
+            }
+        },
+        {
+            "Hyundai",
+            new BrandMaintenanceSpec
+            {
+                MaintenanceCost = 8000, ServiceIntervalKm = 10000, TireReplacementKm = 40000,
+                BatteryReplacementYears = 4
+            }
+        },
+        {
+            "Mahindra",
+            new BrandMaintenanceSpec
+            {
+                MaintenanceCost = 8500, ServiceIntervalKm = 10000, TireReplacementKm = 45000,
+                BatteryReplacementYears = 4
+            }
+        },
+        {
+            "Honda",
+            new BrandMaintenanceSpec
+            {
+                MaintenanceCost = 7500, ServiceIntervalKm = 10000, TireReplacementKm = 45000,
+                BatteryReplacementYears = 4
+            }
+        },
+        {
+            "Toyota",
+            new BrandMaintenanceSpec
+            {
+                MaintenanceCost = 7500, ServiceIntervalKm = 10000, TireReplacementKm = 50000,
+                BatteryReplacementYears = 5
+            }
+        },
+        {
+            "Kia",
+            new BrandMaintenanceSpec
+            {
+                MaintenanceCost = 8500, ServiceIntervalKm = 10000, TireReplacementKm = 40000,
+                BatteryReplacementYears = 4
+            }
+        },
+        {
+            "Ford",
+            new BrandMaintenanceSpec
+            {
+                MaintenanceCost = 9500, ServiceIntervalKm = 15000, TireReplacementKm = 40000,
+                BatteryReplacementYears = 4
+            }
+        },
+        {
+            "Skoda",
+            new BrandMaintenanceSpec
+            {
+                MaintenanceCost = 9500, ServiceIntervalKm = 15000, TireReplacementKm = 50000,
+                BatteryReplacementYears = 5
+            }
+        },
+        {
+            "Volkswagen",
+            new BrandMaintenanceSpec
+            {
+                MaintenanceCost = 10000, ServiceIntervalKm = 15000, TireReplacementKm = 50000,
+                BatteryReplacementYears = 5
+            }
+        },
+        {
+            "Nissan",
+            new BrandMaintenanceSpec
+            {
+                MaintenanceCost = 7000, ServiceIntervalKm = 10000, TireReplacementKm = 40000,
+                BatteryReplacementYears = 4
+            }
+        },
+        {
+            "Renault",
+            new BrandMaintenanceSpec
+            {
+                MaintenanceCost = 7500, ServiceIntervalKm = 10000, TireReplacementKm = 40000,
+                BatteryReplacementYears = 4
+            }
+        },
+        {
+            "MG",
+            new BrandMaintenanceSpec
+            {
+                MaintenanceCost = 9000, ServiceIntervalKm = 10000, TireReplacementKm = 40000,
+                BatteryReplacementYears = 4
+            }
+        },
+        {
+            "Jeep",
+            new BrandMaintenanceSpec
+            {
+                MaintenanceCost = 13000, ServiceIntervalKm = 15000, TireReplacementKm = 35000,
+                BatteryReplacementYears = 4
+            }
+        },
+        {
+            "BMW",
+            new BrandMaintenanceSpec
+            {
+                MaintenanceCost = 116000, ServiceIntervalKm = 15000, TireReplacementKm = 40000,
+                BatteryReplacementYears = 3
+            }
+        },
+        {
+            "Mercedes",
+            new BrandMaintenanceSpec
+            {
+                MaintenanceCost = 109000, ServiceIntervalKm = 15000, TireReplacementKm = 35000,
+                BatteryReplacementYears = 3
+            }
+        },
+        {
+            "Mercedes-Benz",
+            new BrandMaintenanceSpec
+            {
+                MaintenanceCost = 109000, ServiceIntervalKm = 15000, TireReplacementKm = 35000,
+                BatteryReplacementYears = 3
+            }
+        },
+        {
+            "Audi",
+            new BrandMaintenanceSpec
+            {
+                MaintenanceCost = 118000, ServiceIntervalKm = 15000, TireReplacementKm = 40000,
+                BatteryReplacementYears = 3
+            }
+        },
+        {
+            "Jaguar",
+            new BrandMaintenanceSpec
+            {
+                MaintenanceCost = 160000, ServiceIntervalKm = 15000, TireReplacementKm = 35000,
+                BatteryReplacementYears = 3
+            }
+        },
+        {
+            "Land Rover",
+            new BrandMaintenanceSpec
+            {
+                MaintenanceCost = 170000, ServiceIntervalKm = 15000, TireReplacementKm = 35000,
+                BatteryReplacementYears = 3
+            }
+        },
+        {
+            "Volvo",
+            new BrandMaintenanceSpec
+            {
+                MaintenanceCost = 110000, ServiceIntervalKm = 15000, TireReplacementKm = 40000,
+                BatteryReplacementYears = 3
+            }
+        },
+        {
+            "Lexus",
+            new BrandMaintenanceSpec
+            {
+                MaintenanceCost = 80000, ServiceIntervalKm = 15000, TireReplacementKm = 45000,
+                BatteryReplacementYears = 4
+            }
+        },
+        {
+            "Mini",
+            new BrandMaintenanceSpec
+            {
+                MaintenanceCost = 122000, ServiceIntervalKm = 15000, TireReplacementKm = 35000,
+                BatteryReplacementYears = 3
+            }
+        },
+        {
+            "Porsche",
+            new BrandMaintenanceSpec
+            {
+                MaintenanceCost = 170000, ServiceIntervalKm = 15000, TireReplacementKm = 35000,
+                BatteryReplacementYears = 3
+            }
+        },
+        {
+            "Tesla",
+            new BrandMaintenanceSpec
+            {
+                MaintenanceCost = 120000, ServiceIntervalKm = 15000, TireReplacementKm = 40000,
+                BatteryReplacementYears = 4
+            }
+        },
+        {
+            "Maserati",
+            new BrandMaintenanceSpec
+            {
+                MaintenanceCost = 143000, ServiceIntervalKm = 15000, TireReplacementKm = 35000,
+                BatteryReplacementYears = 3
+            }
+        },
+        {
+            "Chevrolet",
+            new BrandMaintenanceSpec
+            {
+                MaintenanceCost = 8500, ServiceIntervalKm = 15000, TireReplacementKm = 40000,
+                BatteryReplacementYears = 4
+            }
+        },
+        {
+            "Fiat",
+            new BrandMaintenanceSpec
+            {
+                MaintenanceCost = 8000, ServiceIntervalKm = 10000, TireReplacementKm = 40000,
+                BatteryReplacementYears = 4
+            }
+        },
+        {
+            "Mitsubishi",
+            new BrandMaintenanceSpec
+            {
+                MaintenanceCost = 10000, ServiceIntervalKm = 15000, TireReplacementKm = 40000,
+                BatteryReplacementYears = 4
+            }
+        },
+        {
+            "Subaru",
+            new BrandMaintenanceSpec
+            {
+                MaintenanceCost = 9000, ServiceIntervalKm = 15000, TireReplacementKm = 40000,
+                BatteryReplacementYears = 4
+            }
+        },
+        {
+            "Datsun",
+            new BrandMaintenanceSpec
+            {
+                MaintenanceCost = 7000, ServiceIntervalKm = 10000, TireReplacementKm = 40000,
+                BatteryReplacementYears = 4
+            }
+        },
+        {
+            "Buick",
+            new BrandMaintenanceSpec
+            {
+                MaintenanceCost = 87300, ServiceIntervalKm = 15000, TireReplacementKm = 35000,
+                BatteryReplacementYears = 3
+            }
+        },
+        {
+            "Acura",
+            new BrandMaintenanceSpec
+            {
+                MaintenanceCost = 71900, ServiceIntervalKm = 15000, TireReplacementKm = 35000,
+                BatteryReplacementYears = 3
+            }
+        },
+        {
+            "Cadillac",
+            new BrandMaintenanceSpec
+            {
+                MaintenanceCost = 112400, ServiceIntervalKm = 15000, TireReplacementKm = 35000,
+                BatteryReplacementYears = 3
+            }
+        },
+        {
+            "Infiniti",
+            new BrandMaintenanceSpec
+            {
+                MaintenanceCost = 91600, ServiceIntervalKm = 15000, TireReplacementKm = 35000,
+                BatteryReplacementYears = 3
+            }
+        },
+        {
+            "Mazda",
+            new BrandMaintenanceSpec
+            {
+                MaintenanceCost = 66300, ServiceIntervalKm = 15000, TireReplacementKm = 40000,
+                BatteryReplacementYears = 3
+            }
+        },
+        {
+            "Chrysler",
+            new BrandMaintenanceSpec
+            {
+                MaintenanceCost = 87300, ServiceIntervalKm = 15000, TireReplacementKm = 35000,
+                BatteryReplacementYears = 3
+            }
+        },
+        {
+            "Dodge",
+            new BrandMaintenanceSpec
+            {
+                MaintenanceCost = 91000, ServiceIntervalKm = 15000, TireReplacementKm = 35000,
+                BatteryReplacementYears = 3
+            }
+        },
+        {
+            "Ram",
+            new BrandMaintenanceSpec
+            {
+                MaintenanceCost = 99200, ServiceIntervalKm = 15000, TireReplacementKm = 35000,
+                BatteryReplacementYears = 3
+            }
+        },
+        {
+            "Genesis",
+            new BrandMaintenanceSpec
+            {
+                MaintenanceCost = 75200, ServiceIntervalKm = 15000, TireReplacementKm = 35000,
+                BatteryReplacementYears = 3
+            }
+        },
+        {
+            "Lincoln",
+            new BrandMaintenanceSpec
+            {
+                MaintenanceCost = 126200, ServiceIntervalKm = 15000, TireReplacementKm = 35000,
+                BatteryReplacementYears = 3
+            }
+        },
     };
 }

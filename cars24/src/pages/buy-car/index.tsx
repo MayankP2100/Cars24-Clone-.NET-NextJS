@@ -24,7 +24,12 @@ type Car = {
   features: string[];
   highlights: string[];
   tag: string;
-  estimatedMonthlyMaintenanceCost: Number;
+  maintenanceInsights: {
+    monthlyMaintenanceCost: number;
+    serviceInsight: string;
+    tireInsight: string;
+    batteryInsight: string;
+  }
 };
 
 function LoaderCard() {
@@ -192,10 +197,10 @@ const index = () => {
                       )}
                     </div>
                     <div>
-                      {car.estimatedMonthlyMaintenanceCost !== 0 ? (
+                      {car.maintenanceInsights.monthlyMaintenanceCost !== 0 ? (
                         <div
                           className="bg-blue-100 text-blue-800 text-xs font-medium px-2.5 py-1.5 w-fit rounded-full mt-2">
-                          Estimated maintenance cost: ₹{car.estimatedMonthlyMaintenanceCost.toString()}/mo
+                          Estimated maintenance cost: ₹{car.maintenanceInsights.monthlyMaintenanceCost.toString()}/mo
                         </div>
                       ) : (
                         <div
@@ -203,6 +208,20 @@ const index = () => {
                           Estimated maintenance cost not available.
                         </div>
                       )}
+                    </div>
+                    <div className="flex flex-col gap-1 bg-blue-100 p-2 rounded-lg mt-4">
+                      <p className="text-blue-800 text-sm">Insights</p>
+                      <ul className="list-disc list-outside ps-4">
+                        {car.maintenanceInsights.serviceInsight && (
+                          <li className="text-sm text-gray-600">{car.maintenanceInsights.serviceInsight}</li>
+                        )}
+                        {car.maintenanceInsights.tireInsight && (
+                          <li className="text-sm text-gray-600">{car.maintenanceInsights.tireInsight}</li>
+                        )}
+                        {car.maintenanceInsights.batteryInsight && (
+                          <li className="text-sm text-gray-600 ">{car.maintenanceInsights.batteryInsight}</li>
+                        )}
+                      </ul>
                     </div>
                   </div>
                 </Link>

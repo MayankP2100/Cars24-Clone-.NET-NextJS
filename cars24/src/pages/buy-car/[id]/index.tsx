@@ -145,14 +145,14 @@ const index = () => {
               <div className="flex justify-between items-center mb-4">
                 <div>
                   <p className="text-3xl font-bold text-blue-600">
-                    {carDetails.price}
+                    ₹{carDetails.price}
                   </p>
-                  <p className="text-gray-600">EMI from {carDetails.emi}</p>
+                  <p className="text-gray-600">EMI from ₹{carDetails.emi}</p>
                 </div>
                 <div className="text-right">
                   <p className="text-gray-600">{carDetails.location}</p>
                   <p className="text-sm text-gray-500">
-                    {carDetails.specs.km} driven
+                    {carDetails.specs.km}km driven
                   </p>
                 </div>
               </div>
@@ -182,7 +182,7 @@ const index = () => {
                   carDetails.estimatedMonthlyMaintenanceCost !== 0 &&
                     <div className="bg-gray-50 p-3 rounded-lg">
                         <p className="text-gray-600">Estimated maintenance cost</p>
-                        <p className="font-medium">₹{carDetails.estimatedMonthlyMaintenanceCost}/mo</p>
+                        <p className="font-medium">₹{carDetails.maintenanceInsights.monthlyMaintenanceCost}/mo</p>
                     </div>
                 }
 
@@ -214,6 +214,21 @@ const index = () => {
                   {carDetails.features.map((feature: any, index: any) => (
                     <li key={index}>{feature}</li>
                   ))}
+                </ul>
+              </div>
+              {/* Insights */}
+              <div className="flex flex-col gap-2 bg-blue-100 p-4 rounded-lg mt-4">
+                <p className="text-blue-800">Insights</p>
+                <ul className="list-disc list-outside ps-4">
+                  {carDetails.maintenanceInsights.serviceInsight && (
+                    <li className="text-gray-600">{carDetails.maintenanceInsights.serviceInsight}</li>
+                  )}
+                  {carDetails.maintenanceInsights.tireInsight && (
+                    <li className="text-gray-600">{carDetails.maintenanceInsights.tireInsight}</li>
+                  )}
+                  {carDetails.maintenanceInsights.batteryInsight && (
+                    <li className="text-gray-600 ">{carDetails.maintenanceInsights.batteryInsight}</li>
+                  )}
                 </ul>
               </div>
             </div>
