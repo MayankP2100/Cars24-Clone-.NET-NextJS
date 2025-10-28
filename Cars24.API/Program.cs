@@ -58,7 +58,6 @@ app.MapGet("/db-check", async () =>
     catch (Exception e)
     {
         return Results.Problem("MongoDB connection failed: " + e.Message);
-        throw;
     }
 });
 

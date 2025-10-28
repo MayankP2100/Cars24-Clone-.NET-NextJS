@@ -7,6 +7,8 @@ import {AlertCircle, Calendar, Clock, CreditCard, MapPin, Phone, User,} from "lu
 import {useRouter} from "next/router";
 import React, {useEffect, useState} from "react";
 import {toast} from "sonner";
+import Link from "next/link";
+import {Button} from "@/components/ui/button";
 
 const index = () => {
   const [formData, setFormData] = useState({
@@ -156,6 +158,30 @@ const index = () => {
                   </p>
                 </div>
               </div>
+
+              {/* Google Maps */}
+              <div className={'flex flex-wrap gap-x-2 gap-y-1'}>
+                <Button asChild>
+                  <Link
+                    href={`https://www.google.com/maps/search/${carDetails.title}+service+center+${carDetails.location}`}
+                    target={"_blank"}>
+                    View Service Centres in {carDetails.location}
+                  </Link>
+                </Button>
+                <Button asChild>
+                  <Link
+                    href={`https://www.google.com/maps/search/gas+station+${carDetails.location}`} target={"_blank"}>
+                    View Gas Stations in {carDetails.location}
+                  </Link>
+                </Button>
+                <Button asChild>
+                  <Link
+                    href={`https://www.google.com/maps/search/car+pick+ups+${carDetails.location}`} target={"_blank"}>
+                    View Pick Up in {carDetails.location}
+                  </Link>
+                </Button>
+              </div>
+
               {/* Specs Grid */}
               <div className="grid grid-cols-2 gap-4 mb-6">
                 <div className="bg-gray-50 p-3 rounded-lg">

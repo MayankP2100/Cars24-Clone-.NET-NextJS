@@ -5,6 +5,7 @@ import {getCarSummaries} from "@/lib/carapi";
 import {ChevronDown, Heart, Search, Sliders} from "lucide-react";
 import Link from "next/link";
 import {useEffect, useState} from "react";
+import CitySelect from "@/components/buy-car/CitySelect";
 
 type Car = {
   id: string;
@@ -50,15 +51,45 @@ const index = () => {
   const [priceRange, setPriceRange] = useState([0, 1_000_000]);
   const [selectedBrands, setSelectedBrands] = useState<string[]>([]);
   const [cars, setCars] = useState<Car[] | null>(null);
+  const [city, setCity] = useState<string>("All");
 
   useEffect(() => {
     const fetchCars = async () => {
-      const car = await getCarSummaries();
+      const car = await getCarSummaries(city);
       setCars(car);
     };
 
-    fetchCars();
-  });
+    fetchCars().then();
+  }, [city]);
+
+  function getUserLocation() {
+    if ('geolocation' in navigator) {
+      navigator.geolocation.getCurrentPosition(
+        (position) => {
+          const latitude = position.coords.latitude;
+          const longitude = position.coords.longitude;
+          console.log('User location:', {latitude, longitude});
+        },
+        (error) => {
+          switch (error.code) {
+            case error.PERMISSION_DENIED:
+              alert('Permission denied to access location. Please enable it in your browser settings.');
+              break;
+            case error.POSITION_UNAVAILABLE:
+              alert('Location information is unavailable. Please select a city manually.');
+              break;
+            case error.TIMEOUT:
+              alert('The request to get user location timed out.');
+              break;
+            default:
+              alert('An unknown error occurred. Please try again.');
+          }
+        }
+      );
+    } else {
+      alert('Geolocation is not supported by this browser.');
+    }
+  }
 
   return (
     <div className="bg-gray-100">
@@ -108,12 +139,19 @@ const index = () => {
                     </label>
                   ))}
                 </div>
+
+                <div className={'flex flex-col mt-4 gap-1'}>
+                  <Button onClick={getUserLocation} className={'w-fit'}>Use my location</Button>
+                  <p className={'text-sm'}>or manually select your city</p>
+                  <CitySelect value={city} setValue={setCity}/>
+                </div>
+
               </div>
             </div>
           </div>
         </div>
-        {/* cars grid */}
-        <div className="md:col-span-3">
+        {/* car grid */}
+        <div className="md:col-span-3 mt-4">
           <div className="flex justify-between items-center mb-6">
             <h1 className="text-2xl font-bold">Used Cars in Delhi NCR</h1>
             <div className="flex items-center space-x-4">
@@ -196,6 +234,7 @@ const index = () => {
                         </div>
                       )}
                     </div>
+
                     <div>
                       {car.maintenanceInsights.monthlyMaintenanceCost !== 0 ? (
                         <div
@@ -209,6 +248,8 @@ const index = () => {
                         </div>
                       )}
                     </div>
+
+                    {/*Insights*/}
                     <div className="flex flex-col gap-1 bg-blue-100 p-2 rounded-lg mt-4">
                       <p className="text-blue-800 text-sm">Insights</p>
                       <ul className="list-disc list-outside ps-4">

@@ -19,9 +19,9 @@ public class CarsController(CarService carService) : ControllerBase
     }
 
     [HttpGet]
-    public async Task<IActionResult> GetCarSummaries()
+    public async Task<IActionResult> GetCarSummaries([FromQuery] string city = "All")
     {
-        var cars = await carService.GetAllCarsAsync();
+        var cars = await carService.GetAllCarsByCityAsync(city);
 
         return Ok(cars);
     }

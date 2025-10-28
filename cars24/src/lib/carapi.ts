@@ -33,7 +33,7 @@ export const getCarById = async (id: string) => {
   return res.json();
 };
 
-export const getCarSummaries = async () => {
-  const res = await fetch(`${BASE_URL}/api/cars`);
+export const getCarSummaries = async (city: string) => {
+  const res = await fetch(`${BASE_URL}/api/cars?city=${city}`);
   return res.json();
 };

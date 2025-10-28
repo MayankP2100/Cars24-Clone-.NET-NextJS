@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("Cars24.API")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+014c15508fdd0eadd9631a034bc3c05e245f05bb")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+f077c5222c644ecb6b620178dd4c77ad03734541")]
 [assembly: System.Reflection.AssemblyProductAttribute("Cars24.API")]
 [assembly: System.Reflection.AssemblyTitleAttribute("Cars24.API")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]
