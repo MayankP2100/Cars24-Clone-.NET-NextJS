@@ -185,6 +185,12 @@ const index = () => {
     return mileage >= mileageRange[0] && mileage <= mileageRange[1];
   });
 
+// Price range
+  displayCarsFiltered = displayCarsFiltered.filter(car => {
+    const price = parseInt(String(car.price || "0").replace(/[^0-9]/g, "")) || 0;
+    return price >= priceRange[0] && price <= priceRange[1];
+  });
+
 
   return (
     <div className="bg-gray-100">
@@ -193,7 +199,7 @@ const index = () => {
           {/* Filter */}
           <div className="md:col-span-1 space-y-6">
             <h3 className="font-semibold mb-4">Filters</h3>
-            <div className="space-y-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div>
                 <label className="text-sm font-medium mb-2 block">
                   Price Range
@@ -292,44 +298,36 @@ const index = () => {
 
               {/* Year Range */}
               <div>
-                <label>Year</label>
-                <input
-                  type="number"
-                  min="2000"
-                  max="2025"
-                  value={yearRange[0]}
-                  onChange={e => setYearRange([+e.target.value, yearRange[1]])}
-                  className="w-20 mr-2"
-                />to
-                <input
-                  type="number"
-                  min="2000"
-                  max="2025"
-                  value={yearRange[1]}
-                  onChange={e => setYearRange([yearRange[0], +e.target.value])}
-                  className="w-20 ml-2"
+                <label className="text-sm font-medium mb-2 block">Year</label>
+                <Slider
+                  min={2000}
+                  max={2025}
+                  step={1}
+                  value={yearRange}
+                  onValueChange={setYearRange}
+                  className="mt-2"
                 />
+                <div className="flex justify-between mt-2 text-sm text-gray-600">
+                  <span>{yearRange[0]}</span>
+                  <span>{yearRange[1]}</span>
+                </div>
               </div>
 
               {/* Mileage Range */}
               <div>
-                <label>Mileage (km)</label>
-                <input
-                  type="number"
-                  min="0"
-                  max="200000"
-                  value={mileageRange[0]}
-                  onChange={e => setMileageRange([+e.target.value, mileageRange[1]])}
-                  className="w-20 mr-2"
-                />to
-                <input
-                  type="number"
-                  min="0"
-                  max="200000"
-                  value={mileageRange[1]}
-                  onChange={e => setMileageRange([mileageRange[0], +e.target.value])}
-                  className="w-20 ml-2"
+                <label className="text-sm font-medium mb-2 block">Mileage (km)</label>
+                <Slider
+                  min={0}
+                  max={200000}
+                  step={1000}
+                  value={mileageRange}
+                  onValueChange={setMileageRange}
+                  className="mt-2"
                 />
+                <div className="flex justify-between mt-2 text-sm text-gray-600">
+                  <span>{mileageRange[0].toLocaleString()}</span>
+                  <span>{mileageRange[1].toLocaleString()}</span>
+                </div>
               </div>
 
             </div>
@@ -414,94 +412,8 @@ const index = () => {
                 ? Array.from({length: 6}).map((_, index) => (
                   <LoaderCard key={index}/>
                 ))
-                : cars.map((car) => (
-                  <Link
-                    key={car.id}
-                    href={`/buy-car/${car.id}`}
-                    className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow"
-                  >
-                    <div className="relative h-48">
-                      <img
-                        src={car.images[0]}
-                        alt={car.title}
-                        className="w-full h-full object-cover"
-                      />
-                      <button
-                        title={car.title}
-                        className="absolute top-2 right-2 p-1.5 bg-white/80 rounded-full hover:bg-white"
-                      >
-                        <Heart className="h-4 w-4 text-gray-500 hover:text-red-500"/>
-                      </button>
-                    </div>
-                    <div className="p-4">
-                      <h3 className="font-semibold text-lg mb-2">
-                        {car.title}
-                      </h3>
-                      <div className="flex items-center justify-between mb-2">
-                        <div className="text-sm text-gray-600">{car.specs.km} km</div>
-                        <div className="text-sm text-gray-600">
-                          {car.specs.transmission}
-                        </div>
-                        <div className="text-sm text-gray-600">
-                          {car.specs.fuel}
-                        </div>
-                        <div className="text-sm text-gray-600">
-                          {car.specs.owner}
-                        </div>
-                      </div>
-                      <div className="flex items-center justify-between">
-                        <div>
-                          <div className="text-sm text-gray-600">EMI from</div>
-                          <div className="font-semibold">₹{car.emi}</div>
-                        </div>
-                        <div className="text-right">
-                          <div className="text-sm text-gray-600">Price</div>
-                          <div className="font-semibold">₹{car.price}</div>
-                        </div>
-                      </div>
-                      <div className="mt-2 text-xs text-gray-500">
-                        {car.location}
-                      </div>
-                      <div>
-                        {car.tag && (
-                          <div
-                            className="bg-blue-100 text-blue-800 text-xs font-medium px-2.5 py-1.5 w-fit rounded-full mt-2">
-                            {car.tag}
-                          </div>
-                        )}
-                      </div>
-
-                      <div>
-                        {car.maintenanceInsights.monthlyMaintenanceCost !== 0 ? (
-                          <div
-                            className="bg-blue-100 text-blue-800 text-xs font-medium px-2.5 py-1.5 w-fit rounded-full mt-2">
-                            Estimated maintenance cost: ₹{car.maintenanceInsights.monthlyMaintenanceCost.toString()}/mo
-                          </div>
-                        ) : (
-                          <div
-                            className="bg-red-100 text-red-800 text-xs font-medium px-2.5 py-1.5 w-fit rounded-full mt-2">
-                            Estimated maintenance cost not available.
-                          </div>
-                        )}
-                      </div>
-
-                      {/*Insights*/}
-                      <div className="flex flex-col gap-1 bg-blue-100 p-2 rounded-lg mt-4">
-                        <p className="text-blue-800 text-sm">Insights</p>
-                        <ul className="list-disc list-outside ps-4">
-                          {car.maintenanceInsights.serviceInsight && (
-                            <li className="text-sm text-gray-600">{car.maintenanceInsights.serviceInsight}</li>
-                          )}
-                          {car.maintenanceInsights.tireInsight && (
-                            <li className="text-sm text-gray-600">{car.maintenanceInsights.tireInsight}</li>
-                          )}
-                          {car.maintenanceInsights.batteryInsight && (
-                            <li className="text-sm text-gray-600 ">{car.maintenanceInsights.batteryInsight}</li>
-                          )}
-                        </ul>
-                      </div>
-                    </div>
-                  </Link>
+                : displayCarsFiltered.map((car) => (
+                  <CarCard key={car.id} car={car} />
                 ))}
             </div>
           </div>
