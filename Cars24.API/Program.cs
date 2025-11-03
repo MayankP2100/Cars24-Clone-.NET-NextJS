@@ -15,9 +15,11 @@ builder.Services.AddSwaggerGen();
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection")!;
 
 builder.Services.AddSingleton<UserService>();
-builder.Services.AddSingleton<CarService>();
 builder.Services.AddSingleton<AppointmentService>();
 builder.Services.AddSingleton<BookingService>();
+
+builder.Services.AddScoped<CarService>();
+builder.Services.AddScoped<ISearchService, SearchService>();
 
 builder.Services.AddCors(options =>
 {
