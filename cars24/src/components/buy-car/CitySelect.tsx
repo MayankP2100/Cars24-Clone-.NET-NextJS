@@ -4,7 +4,6 @@ const cityList = [
   "All",
   "Mumbai", "Delhi", "Bangalore", "Kolkata", "Chennai",
   "Pune", "Hyderabad", "Ahmedabad", "Jaipur", "Surat"
-  // Add other cities as needed
 ];
 
 export default function CitySelect({value, setValue}: { value: string, setValue: (value: string) => void }) {
