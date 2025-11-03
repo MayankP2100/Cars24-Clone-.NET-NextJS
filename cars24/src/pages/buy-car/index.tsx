@@ -1,13 +1,19 @@
 import {Button} from "@/components/ui/button";
 import {ChevronDown, Sliders} from "lucide-react";
 import {useState} from "react";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import CarCard from "@/components/buy-car/CarCard";
 import LoaderCard from "@/components/buy-car/LoaderCard";
 import FiltersPanel from "@/components/buy-car/FiltersPanel";
 import SearchBar from "@/components/buy-car/SearchBar";
 import {useCarSummaries} from "@/hooks/useCarSummaries";
 import {useSearchSuggestions} from "@/hooks/useSearchSuggestions";
-import {filterAndOrderCars} from "@/lib/filterCars";
+import {filterAndOrderCars, SortOption} from "@/lib/filterCars";
 import {brandList} from "@/lib/cars";
 
 const index = () => {
@@ -18,6 +24,7 @@ const index = () => {
   const [selectedTransmissions, setSelectedTransmissions] = useState<string[]>([]);
   const [yearRange, setYearRange] = useState<[number, number]>([2000, 2025]);
   const [mileageRange, setMileageRange] = useState<[number, number]>([0, 200000]);
+  const [sortBy, setSortBy] = useState<SortOption>('default');
 
   const {cars} = useCarSummaries(city);
 
@@ -68,6 +75,7 @@ const index = () => {
     selectedTransmissions,
     yearRange,
     mileageRange,
+    sortBy,
   });
 
 
@@ -112,14 +120,41 @@ const index = () => {
                   suggestions={suggestions}
                   onSubmit={handleSubmit}
                 />
-                <Button
-                  variant="outline"
-                  className="flex items-center  text-white"
-                >
-                  <Sliders className="h-4 w-4 mr-2"/>
-                  Sort
-                  <ChevronDown className="h-4 w-4 ml-2"/>
-                </Button>
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <Button
+                      variant="outline"
+                      className="flex items-center text-white"
+                    >
+                      <Sliders className="h-4 w-4 mr-2"/>
+                      Sort
+                      <ChevronDown className="h-4 w-4 ml-2"/>
+                    </Button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent align="end">
+                    <DropdownMenuItem onClick={() => setSortBy('default')}>
+                      Default
+                    </DropdownMenuItem>
+                    <DropdownMenuItem onClick={() => setSortBy('price-low-high')}>
+                      Price: Low to High
+                    </DropdownMenuItem>
+                    <DropdownMenuItem onClick={() => setSortBy('price-high-low')}>
+                      Price: High to Low
+                    </DropdownMenuItem>
+                    <DropdownMenuItem onClick={() => setSortBy('year-new-old')}>
+                      Year: Newest First
+                    </DropdownMenuItem>
+                    <DropdownMenuItem onClick={() => setSortBy('year-old-new')}>
+                      Year: Oldest First
+                    </DropdownMenuItem>
+                    <DropdownMenuItem onClick={() => setSortBy('mileage-low-high')}>
+                      Mileage: Low to High
+                    </DropdownMenuItem>
+                    <DropdownMenuItem onClick={() => setSortBy('mileage-high-low')}>
+                      Mileage: High to Low
+                    </DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
               </div>
             </div>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
