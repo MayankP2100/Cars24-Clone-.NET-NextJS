@@ -1,14 +1,14 @@
-import { Button } from "@/components/ui/button";
-import { ChevronDown, Sliders } from "lucide-react";
-import { useState } from "react";
+import {Button} from "@/components/ui/button";
+import {ChevronDown, Sliders} from "lucide-react";
+import {useState} from "react";
 import CarCard from "@/components/buy-car/CarCard";
 import LoaderCard from "@/components/buy-car/LoaderCard";
 import FiltersPanel from "@/components/buy-car/FiltersPanel";
 import SearchBar from "@/components/buy-car/SearchBar";
-import { useCarSummaries } from "@/hooks/useCarSummaries";
-import { useSearchSuggestions } from "@/hooks/useSearchSuggestions";
-import { filterAndOrderCars } from "@/lib/filterCars";
-import { brandList } from "@/lib/cars";
+import {useCarSummaries} from "@/hooks/useCarSummaries";
+import {useSearchSuggestions} from "@/hooks/useSearchSuggestions";
+import {filterAndOrderCars} from "@/lib/filterCars";
+import {brandList} from "@/lib/cars";
 
 const index = () => {
   const [priceRange, setPriceRange] = useState<[number, number]>([0, 1_000_000]);
@@ -19,7 +19,7 @@ const index = () => {
   const [yearRange, setYearRange] = useState<[number, number]>([2000, 2025]);
   const [mileageRange, setMileageRange] = useState<[number, number]>([0, 200000]);
 
-  const { cars } = useCarSummaries(city);
+  const {cars} = useCarSummaries(city);
 
   function getUserLocation() {
     if ('geolocation' in navigator) {
@@ -95,12 +95,6 @@ const index = () => {
           />
         </div>
 
-        {displayCarsFiltered.length === 0 && (
-          <div className="p-8 text-center text-gray-500">
-            No cars found for your search or filters.
-          </div>
-        )}
-
         {/* car grid */}
         {results.length > 0 ? (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mt-4">
@@ -134,9 +128,14 @@ const index = () => {
                   <LoaderCard key={index}/>
                 ))
                 : displayCarsFiltered.map((car) => (
-                  <CarCard key={car.id} car={car} />
+                  <CarCard key={car.id} car={car}/>
                 ))}
             </div>
+            {displayCarsFiltered.length === 0 && (
+              <div className="p-8 text-center text-gray-500">
+                No cars found for your search or filters.
+              </div>
+            )}
           </div>
         )}
       </div>
