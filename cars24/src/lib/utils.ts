@@ -5,5 +5,5 @@ export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
 }
 
-// export const BASE_URL = "https://cars24-clone-net-nextjs.onrender.com";
-export const BASE_URL = "http://localhost:5207";
+export const BASE_URL = "https://cars24-clone-net-nextjs.onrender.com";
+// export const BASE_URL = "http://localhost:5207";
