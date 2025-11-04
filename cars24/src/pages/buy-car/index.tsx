@@ -60,9 +60,10 @@ const index = () => {
   const [results, setResults] = useState<string[]>([]);
 
   // search and filter cars by query
-  function handleSubmit() {
+  function handleSubmit(searchQuery?: string) {
     setSelectedBrands([]);
-    searchCars(query, city).then(data => setResults(Array.isArray(data) ? data : []));
+    const queryToUse = searchQuery !== undefined ? searchQuery : query;
+    searchCars(queryToUse, city).then(data => setResults(Array.isArray(data) ? data : []));
   }
 
   const displayCarsFiltered = filterAndOrderCars(cars, results, {
