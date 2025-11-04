@@ -1,0 +1,36 @@
+// Installation Guide for Notification System Dependencies
+
+// Run these commands to install required packages:
+
+// 1. Firebase packages (required)
+npm install firebase firebase-admin
+
+// 2. Lucide React icons (already installed, but included for reference)
+npm install lucide-react
+
+// 3. Radix UI components (already installed, but included for reference)
+npm install @radix-ui/react-dropdown-menu
+
+// After installation, you need to:
+
+// 1. Create a .env.local file with Firebase credentials
+//    (Copy from .env.example and fill in your Firebase project details)
+
+// 2. Build the service worker
+//    The file at public/firebase-messaging-sw.ts needs to be compiled
+//    It will be served as public/firebase-messaging-sw.js at runtime
+
+// 3. Ensure HTTPS is enabled
+//    Service Workers and Push Notifications require HTTPS in production
+//    In development, localhost:3000 is allowed
+
+// 4. Test notification permissions
+//    Open DevTools > Application > Manifest to verify service worker registration
+//    Check that notification permission is requested on page load
+
+// Verify Installation
+// After setup, check:
+// - Service worker is registered (DevTools > Application > Service Workers)
+// - FCM token is generated (check browser console)
+// - Notification permission prompt appears
+

@@ -22,6 +22,7 @@ import {
 } from "./ui/dropdown-menu";
 import { Button } from "./ui/button";
 import { useAuth } from "@/context/AuthContext";
+import NotificationBell from "@/components/NotificationBell";
 const Header = () => {
   const navItems = [
     { name: "Buy used car", href: "/buy-car" },
@@ -150,6 +151,7 @@ const Header = () => {
           ))}
         </div>
         <div className="hidden lg:flex lg:flex-1 lg:justify-end items-center space-x-4">
+          <NotificationBell />
           <Button
             variant="ghost"
             size="sm"
