@@ -109,7 +109,7 @@ const index = () => {
           {/* Main Content */}
           <div className="lg:col-span-3">
             <div className="flex justify-between items-center mb-6">
-              <h1 className="text-2xl font-bold">Used Cars in Delhi NCR</h1>
+              <h1 className="text-2xl font-bold">Used Cars {city === "All" ? "in India" : `in ${city}`}</h1>
               <div className="flex items-center space-x-4">
 
                 <SearchBar
