@@ -80,7 +80,8 @@ export function filterAndOrderCars(
   });
 
   if (results?.length) {
-    filtered.sort((a, b) => (idOrderMap.get(a.id) ?? 0) - (idOrderMap.get(b.id) ?? 0));
+    filtered = filtered.filter((car) => results.includes(car.id));
+    filtered.sort((a, b) => (idOrderMap.get(a.id) ?? Infinity) - (idOrderMap.get(b.id) ?? Infinity));
   } else {
     switch (sortBy) {
       // Sort by price from lowest to highest

@@ -162,8 +162,8 @@ const FiltersPanel: React.FC<FiltersPanelProps> = ({
           <div className={'w-96'}>
             <label className="text-sm font-medium mb-2 block">Price Range</label>
             <Slider
-              defaultValue={[0, 1_000_000]}
-              max={1_000_000}
+              defaultValue={[0, 3_000_000]}
+              max={3_000_000}
               step={10_000}
               value={priceRange}
               onValueChange={(v) => setPriceRange(v as [number, number])}

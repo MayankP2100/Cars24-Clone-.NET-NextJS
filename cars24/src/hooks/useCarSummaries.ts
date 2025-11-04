@@ -2,9 +2,6 @@ import { useEffect, useState } from "react";
 import { getCarSummaries } from "@/lib/carapi";
 import type { Car } from "@/types/car";
 
-/**
- * Fetches car summaries for a given city and exposes loading state.
- */
 export function useCarSummaries(city: string) {
   const [cars, setCars] = useState<Car[] | null>(null);
   const [loading, setLoading] = useState<boolean>(false);

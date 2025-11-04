@@ -34,8 +34,19 @@ export const getCarById = async (id: string) => {
 };
 
 export const getCarSummaries = async (city: string) => {
-  const res = await fetch(`${BASE_URL}/api/cars?city=${city}`);
-  return res.json();
+  const res = await fetch(`${BASE_URL}/api/cars?city=${city}&limit=100`);
+  const data = await res.json();
+  // Handle both array response and wrapped response
+  if (Array.isArray(data)) {
+    return data;
+  }
+  if (data?.data && Array.isArray(data.data)) {
+    return data.data;
+  }
+  if (data?.cars && Array.isArray(data.cars)) {
+    return data.cars;
+  }
+  return [];
 };
 
 export const searchCars = async (query: string, city: string) => {

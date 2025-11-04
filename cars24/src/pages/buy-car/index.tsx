@@ -13,12 +13,12 @@ import {brandList} from "@/lib/cars";
 import {searchCars} from "@/lib/carapi";
 
 const index = () => {
-  const [priceRange, setPriceRange] = useState<[number, number]>([0, 1_000_000]);
+  const [priceRange, setPriceRange] = useState<[number, number]>([0, 3_000_000]);
   const [selectedBrands, setSelectedBrands] = useState<string[]>([]);
   const [city, setCity] = useState<string>("All");
   const [selectedFuels, setSelectedFuels] = useState<string[]>([]);
   const [selectedTransmissions, setSelectedTransmissions] = useState<string[]>([]);
-  const [yearRange, setYearRange] = useState<[number, number]>([2000, 2025]);
+  const [yearRange, setYearRange] = useState<[number, number]>([1900, 2025]);
   const [mileageRange, setMileageRange] = useState<[number, number]>([0, 200000]);
   const [sortBy, setSortBy] = useState<SortOption>('default');
 
