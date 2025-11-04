@@ -1,7 +1,8 @@
-import React from "react";
+import React, { useState } from "react";
 import {Slider} from "@/components/ui/slider";
 import {Button} from "@/components/ui/button";
 import CitySelect from "@/components/buy-car/CitySelect";
+import { ChevronDown } from "lucide-react";
 
 export type FiltersPanelProps = {
   priceRange: [number, number];
@@ -47,16 +48,81 @@ const FiltersPanel: React.FC<FiltersPanelProps> = ({
                                                      brandList,
                                                      onUseMyLocation,
                                                    }) => {
+  const [expandedSections, setExpandedSections] = useState({
+    brand: true,
+    price: true,
+    specs: false,
+    location: false,
+  });
+
+  const toggleSection = (section: keyof typeof expandedSections) => {
+    setExpandedSections(prev => ({
+      ...prev,
+      [section]: !prev[section]
+    }));
+  };
+
   return (
-    <div className="w-full space-y-6">
-      <h3 className="font-semibold mb-4">Filters</h3>
-      <div className="flex flex-wrap w-fit sm:gap-16 gap-4">
-        {/* Brand */}
-        <div className={'w-96'}>
-          <label>Brand</label>
-          <div className={'flex flex-wrap gap-4 gap-y-1'}>
+    <div className="w-full bg-white rounded-lg shadow-sm p-4 space-y-3">
+      <h3 className="font-semibold text-gray-900 mb-4">Quick Filters</h3>
+
+      {/* Location */}
+      <div className="pb-3 border-b">
+        <label className="text-sm font-medium text-gray-700 block mb-2">Location</label>
+        <div className="flex gap-2 items-center flex-wrap">
+          <Button onClick={onUseMyLocation} size="sm" className="text-xs h-8">
+            My Location
+          </Button>
+          <CitySelect value={city} setValue={setCity}/>
+        </div>
+      </div>
+
+      {/* Price Range */}
+      <div className="pb-3 border-b">
+        <button
+          onClick={() => toggleSection('price')}
+          className="flex items-center justify-between w-full mb-2 hover:text-blue-600"
+        >
+          <label className="text-sm font-medium text-gray-700">Price</label>
+          <ChevronDown
+            className={`h-4 w-4 transition-transform ${expandedSections.price ? 'rotate-180' : ''}`}
+          />
+        </button>
+        {expandedSections.price && (
+          <div className="space-y-2">
+            <Slider
+              min={0}
+              max={3_000_000}
+              step={50_000}
+              value={priceRange}
+              onValueChange={(v) => setPriceRange(v as [number, number])}
+              className="mt-1"
+            />
+            <div className="flex justify-between text-xs text-gray-600 gap-2">
+              <span>₹{(priceRange[0] / 100_000).toFixed(1)}L</span>
+              <span>₹{(priceRange[1] / 100_000).toFixed(1)}L</span>
+            </div>
+          </div>
+        )}
+      </div>
+
+      {/* Brand */}
+      <div className="pb-3 border-b">
+        <button
+          onClick={() => toggleSection('brand')}
+          className="flex items-center justify-between w-full mb-2 hover:text-blue-600"
+        >
+          <label className="text-sm font-medium text-gray-700">
+            Brand {selectedBrands.length > 0 && <span className="text-blue-600 ml-1">({selectedBrands.length})</span>}
+          </label>
+          <ChevronDown
+            className={`h-4 w-4 transition-transform ${expandedSections.brand ? 'rotate-180' : ''}`}
+          />
+        </button>
+        {expandedSections.brand && (
+          <div className="grid grid-cols-2 gap-2 mt-2 max-h-40 overflow-y-auto">
             {brandList.slice(0, 12).map((brand) => (
-              <label key={brand} className="flex items-center">
+              <label key={brand} className="flex items-center text-sm">
                 <input
                   type="checkbox"
                   value={brand}
@@ -67,125 +133,103 @@ const FiltersPanel: React.FC<FiltersPanelProps> = ({
                       prev.includes(value) ? prev.filter((b) => b !== value) : [...prev, value]
                     );
                   }}
-                  className="mr-2"
+                  className="mr-2 h-3 w-3 cursor-pointer"
                 />
-                <span>{brand}</span>
+                <span className="cursor-pointer">{brand}</span>
               </label>
             ))}
           </div>
-        </div>
-
-        {/* Fuel Type */}
-        <div>
-          <label>Fuel</label>
-          <div>
-            {["petrol", "diesel", "cng", "electric", "hybrid"].map((fuel) => (
-              <label key={fuel} className="flex items-center">
-                <input
-                  type="checkbox"
-                  value={fuel}
-                  checked={selectedFuels.includes(fuel)}
-                  onChange={(e) => {
-                    const value = e.target.value;
-                    setSelectedFuels((prev) =>
-                      prev.includes(value) ? prev.filter((f) => f !== value) : [...prev, value]
-                    );
-                  }}
-                  className="mr-2"
-                />
-                <span>{fuel.charAt(0).toUpperCase() + fuel.slice(1)}</span>
-              </label>
-            ))}
-          </div>
-        </div>
-
-        {/* Transmission */}
-        <div>
-          <label>Transmission</label>
-          <div>
-            {["Manual", "Automatic"].map((transmission) => (
-              <label key={transmission} className="flex items-center">
-                <input
-                  type="checkbox"
-                  value={transmission}
-                  checked={selectedTransmissions.includes(transmission)}
-                  onChange={(e) => {
-                    const value = e.target.value;
-                    setSelectedTransmissions((prev) =>
-                      prev.includes(value) ? prev.filter((t) => t !== value) : [...prev, value]
-                    );
-                  }}
-                  className="mr-2"
-                />
-                <span>{transmission}</span>
-              </label>
-            ))}
-          </div>
-        </div>
-
-        <div className={'flex flex-col flex-wrap sm:gap-8 gap-4'}>
-          {/* Year Range */}
-          <div className={'w-96'}>
-            <label className="text-sm font-medium mb-2 block">Year</label>
-            <Slider
-              min={2000}
-              max={2025}
-              step={1}
-              value={yearRange}
-              onValueChange={(v) => setYearRange(v as [number, number])}
-              className="mt-2"
-            />
-            <div className="flex justify-between mt-2 text-sm text-gray-600">
-              <span>{yearRange[0]}</span>
-              <span>{yearRange[1]}</span>
-            </div>
-          </div>
-
-          {/* Mileage Range */}
-          <div className={'w-96'}>
-            <label className="text-sm font-medium mb-2 block">Mileage (km)</label>
-            <Slider
-              min={0}
-              max={200000}
-              step={1000}
-              value={mileageRange}
-              onValueChange={(v) => setMileageRange(v as [number, number])}
-              className="mt-2"
-            />
-            <div className="flex justify-between mt-2 text-sm text-gray-600">
-              <span>{mileageRange[0]}</span>
-              <span>{mileageRange[1]}</span>
-            </div>
-          </div>
-
-          {/* Price */}
-          <div className={'w-96'}>
-            <label className="text-sm font-medium mb-2 block">Price Range</label>
-            <Slider
-              defaultValue={[0, 3_000_000]}
-              max={3_000_000}
-              step={10_000}
-              value={priceRange}
-              onValueChange={(v) => setPriceRange(v as [number, number])}
-              className="mt-2"
-            />
-            <div className="flex justify-between mt-2 text-sm text-gray-600">
-              <span>{priceRange[0]}</span>
-              <span>{priceRange[1]}</span>
-            </div>
-          </div>
-        </div>
-
+        )}
       </div>
-      {/* Location */}
-      <div className={"flex flex-col mt-4 gap-1"}>
-        <Button onClick={onUseMyLocation} className={"w-fit"}>
-          Use my location
-        </Button>
-        <div className={'flex gap-2 items-center'}>
-          <p className={"text-sm"}>or manually select your city</p>
-          <CitySelect value={city} setValue={setCity}/>
-        </div>
+
+      {/* Specifications */}
+      <div className="pb-3 border-b">
+        <button
+          onClick={() => toggleSection('specs')}
+          className="flex items-center justify-between w-full mb-2 hover:text-blue-600"
+        >
+          <label className="text-sm font-medium text-gray-700">Specifications</label>
+          <ChevronDown
+            className={`h-4 w-4 transition-transform ${expandedSections.specs ? 'rotate-180' : ''}`}
+          />
+        </button>
+        {expandedSections.specs && (
+          <div className="space-y-3 mt-2">
+            {/* Fuel Type */}
+            <div>
+              <p className="text-xs font-medium text-gray-600 mb-2">Fuel</p>
+              <div className="flex flex-wrap gap-2">
+                {["Petrol", "Diesel", "CNG", "Electric", "Hybrid"].map((fuel) => (
+                  <label key={fuel} className="flex items-center text-sm">
+                    <input
+                      type="checkbox"
+                      value={fuel.toLowerCase()}
+                      checked={selectedFuels.includes(fuel.toLowerCase())}
+                      onChange={(e) => {
+                        const value = e.target.value;
+                        setSelectedFuels((prev) =>
+                          prev.includes(value) ? prev.filter((f) => f !== value) : [...prev, value]
+                        );
+                      }}
+                      className="mr-1 h-3 w-3 cursor-pointer"
+                    />
+                    <span className="cursor-pointer text-xs">{fuel}</span>
+                  </label>
+                ))}
+              </div>
+            </div>
+
+            {/* Transmission */}
+            <div>
+              <p className="text-xs font-medium text-gray-600 mb-2">Transmission</p>
+              <div className="flex gap-2">
+                {["Manual", "Automatic"].map((transmission) => (
+                  <label key={transmission} className="flex items-center text-sm">
+                    <input
+                      type="checkbox"
+                      value={transmission}
+                      checked={selectedTransmissions.includes(transmission)}
+                      onChange={(e) => {
+                        const value = e.target.value;
+                        setSelectedTransmissions((prev) =>
+                          prev.includes(value) ? prev.filter((t) => t !== value) : [...prev, value]
+                        );
+                      }}
+                      className="mr-1 h-3 w-3 cursor-pointer"
+                    />
+                    <span className="cursor-pointer text-xs">{transmission}</span>
+                  </label>
+                ))}
+              </div>
+            </div>
+
+            {/* Year */}
+            <div>
+              <p className="text-xs font-medium text-gray-600 mb-2">Year: {yearRange[0]} - {yearRange[1]}</p>
+              <Slider
+                min={1900}
+                max={2025}
+                step={1}
+                value={yearRange}
+                onValueChange={(v) => setYearRange(v as [number, number])}
+                className="mt-1"
+              />
+            </div>
+
+            {/* Mileage */}
+            <div>
+              <p className="text-xs font-medium text-gray-600 mb-2">Mileage: {mileageRange[0]} - {mileageRange[1]} km</p>
+              <Slider
+                min={0}
+                max={200000}
+                step={5000}
+                value={mileageRange}
+                onValueChange={(v) => setMileageRange(v as [number, number])}
+                className="mt-1"
+              />
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );
