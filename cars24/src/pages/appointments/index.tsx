@@ -45,11 +45,32 @@ const AppointmentsPage = () => {
     const fetchAppointments = async () => {
       try {
         if (user) {
-          const car = await getAppointmentByUser(user?.id);
-          setAppointments(car);
+          console.log('Fetching appointments for user:', user?.id);
+          const data = await getAppointmentByUser(user?.id);
+          console.log('Appointments API response:', data);
+          console.log('Data type:', typeof data);
+          console.log('Is Array:', Array.isArray(data));
+
+          // Handle different response formats
+          let appointmentsData = data;
+          if (data && typeof data === 'object' && !Array.isArray(data)) {
+            // If response is an object, check if it has a data property
+            if (data.data && Array.isArray(data.data)) {
+              appointmentsData = data.data;
+              console.log('Found appointments in data.data:', appointmentsData);
+            } else if (data.appointments && Array.isArray(data.appointments)) {
+              appointmentsData = data.appointments;
+              console.log('Found appointments in data.appointments:', appointmentsData);
+            } else {
+              console.log('Response is object but no array found:', Object.keys(data));
+            }
+          }
+
+          setAppointments(appointmentsData);
         }
       } catch (error) {
-        console.error(error);
+        console.error('Error fetching appointments:', error);
+        setAppointments([]);
       } finally {
         setLoading(false);
       }
@@ -64,10 +85,23 @@ const AppointmentsPage = () => {
       </div>
     );
   }
-   if (!appointments) {
+
+  if (!appointments || appointments.length === 0) {
     return (
-      <div className="text-center mt-10 text-red-500">
-        Appointments not found.
+      <div className="text-center mt-10 text-gray-600">
+        <div className="min-h-screen bg-gray-50 text-black">
+          <main className="container mx-auto px-4 py-8">
+            <div className="max-w-4xl mx-auto">
+              <h1 className="text-2xl font-bold text-gray-900 mb-6">
+                My Appointments
+              </h1>
+              <div className="bg-white rounded-lg shadow-md p-8 text-center">
+                <AlertCircle className="w-12 h-12 mx-auto text-gray-400 mb-4" />
+                <p className="text-gray-600 text-lg">No appointments found. Book one now!</p>
+              </div>
+            </div>
+          </main>
+        </div>
       </div>
     );
   }
@@ -80,9 +114,17 @@ const AppointmentsPage = () => {
           </h1>
 
           <div className="space-y-4">
-            {appointments?.map((appointment:any) => (
+            {appointments?.map((appointment:any) => {
+              console.log('Rendering appointment:', appointment);
+              console.log('Appointment structure:', {
+                hasAppointmentKey: !!appointment.appointment,
+                hasCarKey: !!appointment.car,
+                carValue: appointment.car,
+                appointmentKeys: Object.keys(appointment)
+              });
+              return (
               <div
-                key={appointment.appointment.id}
+                key={appointment.appointment?.id || Math.random()}
                 className="bg-white rounded-lg shadow-md overflow-hidden"
               >
                 <div
@@ -100,7 +142,7 @@ const AppointmentsPage = () => {
                     <div>
                       <h3 className="text-lg font-medium text-gray-900 flex items-center">
                         <Car className="w-5 h-5 mr-2 text-gray-500" />
-                        {appointment.car.title}
+                        {appointment?.car?.title || 'Car (Details Not Available)'}
                       </h3>
 
                       <div className="mt-4 space-y-2">
@@ -169,7 +211,8 @@ const AppointmentsPage = () => {
                   )}
                 </div>
               </div>
-            ))}
+              );
+            })}
           </div>
 
           {appointments.length === 0 && (

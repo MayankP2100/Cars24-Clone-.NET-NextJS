@@ -11,6 +11,7 @@ import {
 } from "lucide-react";
 import { useRouter } from "next/router";
 import { useAuth } from "@/context/AuthContext";
+import { useNotificationContext } from "@/context/NotificationContext";
 import { toast } from "sonner";
 import { createAppointment } from "@/lib/appointmentapi";
 import { stat } from "fs";
@@ -19,6 +20,7 @@ const BookAppointmentPage = () => {
   const router = useRouter();
   const { id } = router.query;
   const { user } = useAuth();
+  const { addNotification } = useNotificationContext();
   const [formData, setFormData] = useState({
     scheduledDate: "",
     scheduledTime: "",
@@ -72,6 +74,16 @@ const BookAppointmentPage = () => {
       const res = await createAppointment(user.id, appointment);
 
       if (res?.id) {
+        // Add notification
+        addNotification({
+          type: 'appointment',
+          title: '✅ Appointment Confirmed!',
+          message: `Your appointment is scheduled for ${formData.scheduledDate} at ${formData.scheduledTime} in ${formData.location}. Check your appointments to view details.`,
+          timestamp: new Date(),
+          read: false,
+          url: `/appointments/${res.id}`,
+        });
+        
         toast.success("Appointment booked successfully");
         router.push("/appointments/");
       } else {

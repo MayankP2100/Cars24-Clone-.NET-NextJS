@@ -11,21 +11,16 @@ export interface NotificationPayload {
 }
 
 /**
- * Send a push notification to a user via backend API
- * This should only be called from the backend/server
+ * For production: Backend should send notifications via Firebase Admin SDK
+ * This service is a placeholder for future backend integration
+ *
+ * Current implementation: Use notification context directly in components
+ * Example: const { addNotification } = useNotificationContext();
  */
 export const sendNotification = async (payload: NotificationPayload) => {
   try {
-    // For production: call your backend API, not the internal Next.js API
-    // Example: const backendUrl = process.env.NEXT_PUBLIC_API_URL;
-    // This is a simplified version for demo purposes
-
-    console.log('Notification would be sent:', payload);
-    console.log('In production, this would call your backend API to send via Firebase Admin SDK');
-
-    // Don't actually call the API from client-side for security
-    // The test page will handle notifications client-side instead
-    return { success: true, message: 'Notification logged (client-side only)' };
+    console.log('Notification logged:', payload);
+    return { success: true, message: 'Notification processed' };
   } catch (error) {
     console.error('Error processing notification:', error);
     throw error;

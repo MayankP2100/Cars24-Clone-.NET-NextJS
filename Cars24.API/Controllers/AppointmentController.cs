@@ -46,12 +46,17 @@ public class AppointmentController(
     public async Task<IActionResult> GetAppointmentByUserId(string userId)
     {
         var user = await userService.GetUserByIdAsync(userId);
+        
+        if (user == null) return NotFound("User not found.");
+        if (user.AppointmentId == null) return NotFound("User has no appointments.");
 
         var results = new List<AppointmentDto>();
 
         foreach (var appointmentId in user.AppointmentId)
         {
             var appointment = await appointmentService.GetAppointmentByIdAsync(appointmentId);
+            
+            if (appointment == null) continue;
             
             Car? car = null;
             if (!string.IsNullOrEmpty(appointment.CarId))

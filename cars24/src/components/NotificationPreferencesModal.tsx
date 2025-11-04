@@ -36,8 +36,8 @@ export const NotificationPreferencesModal: React.FC<NotificationPreferencesModal
   const [saved, setSaved] = useState(false);
 
   useEffect(() => {
-    // load preferences from backend
-    fetchPreferences();
+    // load preferences from backend - skip for now as API not implemented
+    // fetchPreferences();
   }, []);
 
   const fetchPreferences = async () => {

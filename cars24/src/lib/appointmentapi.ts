@@ -19,9 +19,24 @@ export const getAppointmentById = async (id: string) => {
 };
 
 export const getAppointmentByUser = async (userId: string) => {
-  const res = await fetch(
-    `${BASE_URL}/api/appointment/user/${userId}/appointments`
-  );
+  const url = `${BASE_URL}/api/appointment/user/${userId}/appointments`;
+  console.log('Fetching from URL:', url);
 
-  return res.json();
+  try {
+    const res = await fetch(url);
+    console.log('Response status:', res.status);
+    console.log('Response ok:', res.ok);
+
+    if (!res.ok) {
+      console.error('API Error:', res.statusText);
+      return [];
+    }
+
+    const data = await res.json();
+    console.log('Parsed JSON data:', data);
+    return data;
+  } catch (error) {
+    console.error('Fetch error:', error);
+    return [];
+  }
 };

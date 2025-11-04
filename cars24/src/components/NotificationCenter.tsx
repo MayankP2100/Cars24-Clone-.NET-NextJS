@@ -86,80 +86,100 @@ export const NotificationCenter: React.FC<NotificationCenterProps> = ({
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-      <div className="bg-white rounded-lg shadow-lg max-w-md w-full mx-4 max-h-96 flex flex-col">
-        <div className="flex items-center justify-between p-4 border-b">
-          <div className="flex items-center gap-2">
-            <Bell className="h-6 w-6 text-blue-600" />
-            <h2 className="text-xl font-bold">Notifications</h2>
-            {unreadCount > 0 && (
-              <span className="bg-red-600 text-white text-xs font-bold px-2 py-1 rounded-full">
-                {unreadCount}
-              </span>
-            )}
+    <div className="fixed inset-0 z-50 bg-white flex flex-col">
+      {/* Top Navigation Bar */}
+      <div className="border-b border-gray-200 bg-gradient-to-r from-blue-50 to-indigo-50 sticky top-0 z-40">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <div className="bg-blue-600 p-2 rounded-lg">
+              <Bell className="h-6 w-6 text-white" />
+            </div>
+            <div>
+              <h1 className="text-2xl font-bold text-gray-900">Notifications</h1>
+              {unreadCount > 0 && (
+                <span className="text-sm text-gray-600">{unreadCount} new notifications</span>
+              )}
+            </div>
           </div>
-          <button onClick={onClose} className="p-1 hover:bg-gray-100 rounded">
-            <X className="h-5 w-5" />
+          <button
+            onClick={onClose}
+            className="p-3 hover:bg-white rounded-lg transition-colors text-gray-500 hover:text-gray-700"
+          >
+            <X className="h-6 w-6" />
           </button>
         </div>
+      </div>
 
-        <div className="flex-1 overflow-y-auto">
+      {/* Main Content Area */}
+      <div className="flex-1 overflow-y-auto bg-gray-50">
+        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
           {localNotifications.length === 0 ? (
-            <div className="flex items-center justify-center h-full text-gray-500">
+            <div className="flex items-center justify-center min-h-[60vh]">
               <div className="text-center">
-                <Bell className="h-12 w-12 mx-auto mb-3 opacity-30" />
-                <p>No notifications yet</p>
+                <div className="bg-gray-200 p-6 rounded-full w-fit mx-auto mb-4">
+                  <Bell className="h-12 w-12 text-gray-400" />
+                </div>
+                <p className="text-xl font-semibold text-gray-900">No notifications yet</p>
+                <p className="text-gray-500 mt-2">Stay tuned for updates</p>
               </div>
             </div>
           ) : (
-            <div className="divide-y">
+            <div className="space-y-4">
               {localNotifications.map((notification) => (
                 <div
                   key={notification.id}
                   onClick={() => handleNotificationClick(notification)}
-                  className={`p-4 cursor-pointer hover:bg-gray-50 transition-colors ${
-                    !notification.read ? 'bg-blue-50' : ''
+                  className={`bg-white rounded-lg shadow-md hover:shadow-lg transition-all p-6 cursor-pointer border-l-4 ${
+                    !notification.read ? 'border-l-blue-600 bg-blue-50' : 'border-l-gray-200'
                   }`}
                 >
-                  <div className="flex items-start gap-3">
-                    {getNotificationIcon(notification.type)}
-                    <div className="flex-1 min-w-0">
-                      <p className="font-semibold text-sm text-gray-900 truncate">
-                        {notification.title}
-                      </p>
-                      <p className="text-sm text-gray-600 mt-1 line-clamp-2">
-                        {notification.message}
-                      </p>
-                      <p className="text-xs text-gray-500 mt-1">
-                        {formatTime(notification.timestamp)}
-                      </p>
+                  <div className="flex items-start gap-4">
+                    <div className="mt-1 flex-shrink-0">
+                      {getNotificationIcon(notification.type)}
                     </div>
-                    <button
-                      onClick={(e) => handleDelete(notification.id, e)}
-                      className="p-1 hover:bg-red-100 rounded transition-colors"
-                    >
-                      <Trash2 className="h-4 w-4 text-red-600" />
-                    </button>
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-start justify-between gap-4">
+                        <div className="flex-1">
+                          <p className="text-lg font-semibold text-gray-900">
+                            {notification.title}
+                          </p>
+                          <p className="text-gray-600 mt-2 leading-relaxed">
+                            {notification.message}
+                          </p>
+                          <p className="text-sm text-gray-400 mt-3 font-medium">
+                            {formatTime(notification.timestamp)}
+                          </p>
+                        </div>
+                        <button
+                          onClick={(e) => handleDelete(notification.id, e)}
+                          className="p-2 hover:bg-red-100 rounded-lg transition-all flex-shrink-0"
+                          title="Delete notification"
+                        >
+                          <Trash2 className="h-5 w-5 text-red-600" />
+                        </button>
+                      </div>
+                    </div>
                   </div>
                 </div>
               ))}
             </div>
           )}
         </div>
-
-        {localNotifications.length > 0 && (
-          <div className="border-t p-3">
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={handleClearAll}
-              className="w-full text-xs"
-            >
-              Clear All
-            </Button>
-          </div>
-        )}
       </div>
+
+      {/* Footer */}
+      {localNotifications.length > 0 && (
+        <div className="border-t border-gray-200 bg-white p-6 sticky bottom-0">
+          <div className="max-w-4xl mx-auto">
+            <button
+              onClick={handleClearAll}
+              className="w-full px-6 py-3 text-lg font-medium bg-red-50 hover:bg-red-100 text-red-700 border border-red-200 rounded-lg transition-colors"
+            >
+              Clear All Notifications
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
