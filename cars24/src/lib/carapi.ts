@@ -37,3 +37,8 @@ export const getCarSummaries = async (city: string) => {
   const res = await fetch(`${BASE_URL}/api/cars?city=${city}`);
   return res.json();
 };
+
+export const searchCars = async (query: string, city: string) => {
+  return await fetch(`${BASE_URL}/api/search?query=${query}&city=${city}`)
+    .then(res => res.json());
+}

@@ -1,10 +1,15 @@
-import { Car } from "@/types/car";
-import { getBrandFromTitle } from "@/lib/cars";
+import {Car} from "@/types/car";
+import {getBrandFromTitle} from "@/lib/cars";
 
-// Available sorting options for cars
-export type SortOption = 'default' | 'price-low-high' | 'price-high-low' | 'year-new-old' | 'year-old-new' | 'mileage-low-high' | 'mileage-high-low';
+export type SortOption =
+  'default'
+  | 'price-low-high'
+  | 'price-high-low'
+  | 'year-new-old'
+  | 'year-old-new'
+  | 'mileage-low-high'
+  | 'mileage-high-low';
 
-// Filter criteria type definition
 export type Filters = {
   priceRange: [number, number];
   selectedBrands: string[];
@@ -15,16 +20,6 @@ export type Filters = {
   sortBy?: SortOption;
 };
 
-/**
- * Filters and orders the provided cars based on search results and filter criteria.
- * When search results are present, they take priority in ordering.
- * Otherwise, sorting is applied based on the sortBy option.
- *
- * @param cars - The array of cars to filter and sort
- * @param results - Search results IDs (if any) that prioritize ordering
- * @param filters - All filtering and sorting criteria
- * @returns Filtered and sorted array of cars
- */
 export function filterAndOrderCars(
   cars: Car[] | null | undefined,
   results: string[],
@@ -40,15 +35,12 @@ export function filterAndOrderCars(
     sortBy = 'default',
   } = filters;
 
-  // Create a copy of cars array, or start with empty array if null/undefined
   const list: Car[] = Array.isArray(cars) ? cars.slice() : [];
 
-  // Create a map of result IDs to their order index for prioritized ordering
   const idOrderMap = new Map(results.map((id, idx) => [id, idx] as const));
 
   let filtered = list;
 
-  // Filter by selected car brands
   if (selectedBrands?.length) {
     filtered = filtered.filter((car) =>
       selectedBrands.some(
@@ -57,7 +49,6 @@ export function filterAndOrderCars(
     );
   }
 
-  // Filter by selected fuel types
   if (selectedFuels?.length) {
     filtered = filtered.filter((car) =>
       selectedFuels.some(
@@ -66,7 +57,6 @@ export function filterAndOrderCars(
     );
   }
 
-  // Filter by selected transmission types
   if (selectedTransmissions?.length) {
     filtered = filtered.filter((car) =>
       selectedTransmissions.some(
@@ -75,30 +65,23 @@ export function filterAndOrderCars(
     );
   }
 
-  // Filter by year range
   filtered = filtered.filter(
     (car) => (car.specs.year || 0) >= yearRange[0] && (car.specs.year || 0) <= yearRange[1]
   );
 
-  // Filter by mileage range
   filtered = filtered.filter((car) => {
     const mileage = parseInt((car.specs.km || "0").replace(/,/g, "")) || 0;
     return mileage >= mileageRange[0] && mileage <= mileageRange[1];
   });
 
-  // Filter by price range
   filtered = filtered.filter((car) => {
     const price = parseInt(String(car.price || "0").replace(/[^0-9]/g, "")) || 0;
     return price >= priceRange[0] && price <= priceRange[1];
   });
 
-  // Apply sorting logic
-  // Priority 1: If search results exist, order by search result ranking
-  // Priority 2: Otherwise, apply the selected sort option
   if (results?.length) {
     filtered.sort((a, b) => (idOrderMap.get(a.id) ?? 0) - (idOrderMap.get(b.id) ?? 0));
   } else {
-    // Apply sorting based on sortBy option
     switch (sortBy) {
       // Sort by price from lowest to highest
       case 'price-low-high':
@@ -141,7 +124,6 @@ export function filterAndOrderCars(
         });
         break;
       default:
-        // 'default' - no additional sorting applied
         break;
     }
   }

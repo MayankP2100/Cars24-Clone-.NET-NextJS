@@ -1,7 +1,7 @@
 import Link from "next/link";
 import {Heart} from "lucide-react";
 
-export default function CarCard({car}) {
+export default function CarCard({car}: { car: any }) {
   const m = car.maintenanceInsights || {};
   const specs = car.specs || {};
   return (
