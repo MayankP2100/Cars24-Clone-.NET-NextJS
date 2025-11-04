@@ -103,81 +103,74 @@ const index = () => {
           />
         </div>
 
-        {results.length > 0 ? (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mt-4">
-            {displayCarsFiltered.map(car => <CarCard key={car.id} car={car}/>)}
+        <div className="mt-4">
+          <div className="flex justify-between items-center mb-6">
+            <h1 className="text-2xl font-bold">Used Cars in Delhi NCR</h1>
+            <div className="flex items-center space-x-4">
+
+              <SearchBar
+                query={query}
+                setQuery={setQuery}
+                suggestions={suggestions}
+                onSubmit={handleSubmit}
+              />
+
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button
+                    variant="outline"
+                    className="flex items-center text-white"
+                  >
+                    <Sliders className="h-4 w-4 mr-2"/>
+                    Sort
+                    <ChevronDown className="h-4 w-4 ml-2"/>
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end">
+                  <DropdownMenuItem onClick={() => setSortBy('default')}>
+                    Default
+                  </DropdownMenuItem>
+                  <DropdownMenuItem onClick={() => setSortBy('price-low-high')}>
+                    Price: Low to High
+                  </DropdownMenuItem>
+                  <DropdownMenuItem onClick={() => setSortBy('price-high-low')}>
+                    Price: High to Low
+                  </DropdownMenuItem>
+                  <DropdownMenuItem onClick={() => setSortBy('year-new-old')}>
+                    Year: Newest First
+                  </DropdownMenuItem>
+                  <DropdownMenuItem onClick={() => setSortBy('year-old-new')}>
+                    Year: Oldest First
+                  </DropdownMenuItem>
+                  <DropdownMenuItem onClick={() => setSortBy('mileage-low-high')}>
+                    Mileage: Low to High
+                  </DropdownMenuItem>
+                  <DropdownMenuItem onClick={() => setSortBy('mileage-high-low')}>
+                    Mileage: High to Low
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            </div>
           </div>
 
-        ) : (
-          <div className="md:col-span-3 mt-4">
-            <div className="flex justify-between items-center mb-6">
-              <h1 className="text-2xl font-bold">Used Cars in Delhi NCR</h1>
-              <div className="flex items-center space-x-4">
-
-                <SearchBar
-                  query={query}
-                  setQuery={setQuery}
-                  suggestions={suggestions}
-                  onSubmit={handleSubmit}
-                />
-
-                <DropdownMenu>
-                  <DropdownMenuTrigger asChild>
-                    <Button
-                      variant="outline"
-                      className="flex items-center text-white"
-                    >
-                      <Sliders className="h-4 w-4 mr-2"/>
-                      Sort
-                      <ChevronDown className="h-4 w-4 ml-2"/>
-                    </Button>
-                  </DropdownMenuTrigger>
-                  <DropdownMenuContent align="end">
-                    <DropdownMenuItem onClick={() => setSortBy('default')}>
-                      Default
-                    </DropdownMenuItem>
-                    <DropdownMenuItem onClick={() => setSortBy('price-low-high')}>
-                      Price: Low to High
-                    </DropdownMenuItem>
-                    <DropdownMenuItem onClick={() => setSortBy('price-high-low')}>
-                      Price: High to Low
-                    </DropdownMenuItem>
-                    <DropdownMenuItem onClick={() => setSortBy('year-new-old')}>
-                      Year: Newest First
-                    </DropdownMenuItem>
-                    <DropdownMenuItem onClick={() => setSortBy('year-old-new')}>
-                      Year: Oldest First
-                    </DropdownMenuItem>
-                    <DropdownMenuItem onClick={() => setSortBy('mileage-low-high')}>
-                      Mileage: Low to High
-                    </DropdownMenuItem>
-                    <DropdownMenuItem onClick={() => setSortBy('mileage-high-low')}>
-                      Mileage: High to Low
-                    </DropdownMenuItem>
-                  </DropdownMenuContent>
-                </DropdownMenu>
-              </div>
-            </div>
-
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {cars === null
-                ?
-                Array.from({length: 6}).map((_, index) => (
-                  <LoaderCard key={index}/>
-                ))
-                :
-                displayCarsFiltered.map((car) => (
-                  <CarCard key={car.id} car={car}/>
-                ))}
-            </div>
-
-            {displayCarsFiltered.length === 0 && (
-              <div className="p-8 text-center text-gray-500">
-                No cars found for your search or filters.
-              </div>
-            )}
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {cars === null
+              ?
+              Array.from({length: 6}).map((_, index) => (
+                <LoaderCard key={index}/>
+              ))
+              :
+              displayCarsFiltered.map((car) => (
+                <CarCard key={car.id} car={car}/>
+              ))}
           </div>
-        )}
+
+          {displayCarsFiltered.length === 0 && (
+            <div className="p-8 text-center text-gray-500">
+              No cars found for your search or filters.
+            </div>
+          )}
+        </div>
       </div>
     </div>
   );
