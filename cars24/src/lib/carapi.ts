@@ -36,7 +36,7 @@ export const getCarById = async (id: string) => {
 export const getCarSummaries = async (city: string) => {
   const res = await fetch(`${BASE_URL}/api/cars?city=${city}&limit=100`);
   const data = await res.json();
-  // Handle both array response and wrapped response
+  // support different response formats from API
   if (Array.isArray(data)) {
     return data;
   }

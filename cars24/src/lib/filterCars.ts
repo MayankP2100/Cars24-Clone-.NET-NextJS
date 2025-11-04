@@ -84,7 +84,6 @@ export function filterAndOrderCars(
     filtered.sort((a, b) => (idOrderMap.get(a.id) ?? Infinity) - (idOrderMap.get(b.id) ?? Infinity));
   } else {
     switch (sortBy) {
-      // Sort by price from lowest to highest
       case 'price-low-high':
         filtered.sort((a, b) => {
           const priceA = parseInt(String(a.price || "0").replace(/[^0-9]/g, "")) || 0;
@@ -92,7 +91,6 @@ export function filterAndOrderCars(
           return priceA - priceB;
         });
         break;
-      // Sort by price from highest to lowest
       case 'price-high-low':
         filtered.sort((a, b) => {
           const priceA = parseInt(String(a.price || "0").replace(/[^0-9]/g, "")) || 0;
@@ -100,15 +98,12 @@ export function filterAndOrderCars(
           return priceB - priceA;
         });
         break;
-      // Sort by year from newest to oldest
       case 'year-new-old':
         filtered.sort((a, b) => (b.specs.year || 0) - (a.specs.year || 0));
         break;
-      // Sort by year from oldest to newest
       case 'year-old-new':
         filtered.sort((a, b) => (a.specs.year || 0) - (b.specs.year || 0));
         break;
-      // Sort by mileage from lowest to highest
       case 'mileage-low-high':
         filtered.sort((a, b) => {
           const mileageA = parseInt((a.specs.km || "0").replace(/,/g, "")) || 0;
@@ -116,7 +111,6 @@ export function filterAndOrderCars(
           return mileageA - mileageB;
         });
         break;
-      // Sort by mileage from highest to lowest
       case 'mileage-high-low':
         filtered.sort((a, b) => {
           const mileageA = parseInt((a.specs.km || "0").replace(/,/g, "")) || 0;

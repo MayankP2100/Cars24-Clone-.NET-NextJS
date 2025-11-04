@@ -63,9 +63,9 @@ const ImagesAndSpecsForm: React.FC<ImagesAndSpecsFormProps> = ({
     setIsValid(!!specsFilled && hasImages);
   }, [carDetails]);
 
-  // In a real implementation, this would handle file uploads
+  // TODO: implement real file uploads instead of this placeholder stuff
   const handleImageUpload = () => {
-    // Simulating image upload by using placeholder images
+    // just using random images for now
     if (carDetails.images.length < 10) {
       const randomImage =
         placeholderImages[Math.floor(Math.random() * placeholderImages.length)];

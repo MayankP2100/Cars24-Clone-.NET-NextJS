@@ -4,7 +4,7 @@ import { useAuth } from "@/context/AuthContext";
 import { getAppointmentByUser } from "@/lib/appointmentapi";
 
 const AppointmentsPage = () => {
-  // Mock appointments data matching MongoDB schema
+  // keeping this here for reference if we need dummy data
   // const appointments = [
   //   {
   //     id: '1',

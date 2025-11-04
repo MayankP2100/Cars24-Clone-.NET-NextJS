@@ -33,7 +33,7 @@ const index = () => {
           console.log('User location:', {latitude, longitude});
         },
         (error) => {
-          // Handle geolocation errors with appropriate user feedback
+          // show relevant error message based on the error type
           switch (error.code) {
             case error.PERMISSION_DENIED:
               alert('Permission denied to access location. Please enable it in your browser settings.');
@@ -54,12 +54,12 @@ const index = () => {
     }
   }
 
-  // Search functionality with auto-suggestions
+  // search query and suggestions
   const [query, setQuery] = useState('');
   const suggestions = useSearchSuggestions(query);
   const [results, setResults] = useState<string[]>([]);
 
-  // Handle search submission - fetch matching cars from API
+  // search and filter cars by query
   function handleSubmit() {
     setSelectedBrands([]);
     searchCars(query, city).then(data => setResults(Array.isArray(data) ? data : []));

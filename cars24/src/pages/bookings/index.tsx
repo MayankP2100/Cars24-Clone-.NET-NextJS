@@ -25,7 +25,7 @@ import { useAuth } from "@/context/AuthContext";
 import { getBookingByUser } from "@/lib/bookingapi";
 
 const PurchasedCarsPage = () => {
-  // Mock purchased cars data matching MongoDB schema
+  // keeping this here for reference if we need dummy data
   // const purchasedCars = [
   //   {
   //     id: "1",
