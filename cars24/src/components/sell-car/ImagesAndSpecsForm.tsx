@@ -9,7 +9,7 @@ import {
   User,
   X,
 } from "lucide-react";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 type CarDetails = {
   id: string;
   title: string;
@@ -43,11 +43,12 @@ const ImagesAndSpecsForm: React.FC<ImagesAndSpecsFormProps> = ({
 }) => {
   const [isValid, setIsValid] = useState(false);
   const [dragActive, setDragActive] = useState(false);
+  const [uploadError, setUploadError] = useState<string>("");
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
-  const placeholderImages = [
-    "https://images.pexels.com/photos/112460/pexels-photo-112460.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1",
-    "https://images.pexels.com/photos/116675/pexels-photo-116675.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1",
-  ];
+  const MAX_IMAGES = 10;
+  const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB
+  const ALLOWED_TYPES = ["image/jpeg", "image/png", "image/webp"];
 
   useEffect(() => {
     const { specs } = carDetails;
@@ -63,16 +64,81 @@ const ImagesAndSpecsForm: React.FC<ImagesAndSpecsFormProps> = ({
     setIsValid(!!specsFilled && hasImages);
   }, [carDetails]);
 
-  // TODO: implement real file uploads instead of this placeholder stuff
-  const handleImageUpload = () => {
-    // just using random images for now
-    if (carDetails.images.length < 10) {
-      const randomImage =
-        placeholderImages[Math.floor(Math.random() * placeholderImages.length)];
+  // convert file to base64
+  const fileToBase64 = (file: File): Promise<string> => {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.readAsDataURL(file);
+      reader.onload = () => resolve(reader.result as string);
+      reader.onerror = (error) => reject(error);
+    });
+  };
+
+  // validate image file
+  const validateImageFile = (file: File): { valid: boolean; error?: string } => {
+    if (!ALLOWED_TYPES.includes(file.type)) {
+      return {
+        valid: false,
+        error: "Only JPEG, PNG, and WebP images are allowed",
+      };
+    }
+    if (file.size > MAX_FILE_SIZE) {
+      return {
+        valid: false,
+        error: "File size must be less than 5MB",
+      };
+    }
+    return { valid: true };
+  };
+
+  // handle files (from input, drag-drop, etc)
+  const handleFiles = async (files: FileList | null) => {
+    if (!files || files.length === 0) return;
+
+    setUploadError("");
+    const currentImageCount = carDetails.images.length;
+    const availableSlots = MAX_IMAGES - currentImageCount;
+
+    if (availableSlots <= 0) {
+      setUploadError(`You can only add up to ${MAX_IMAGES} images`);
+      return;
+    }
+
+    const filesToProcess = Array.from(files).slice(0, availableSlots);
+    const newImages: string[] = [];
+    let hasError = false;
+
+    for (const file of filesToProcess) {
+      const validation = validateImageFile(file);
+      if (!validation.valid) {
+        setUploadError(validation.error || "Invalid file");
+        hasError = true;
+        break;
+      }
+
+      try {
+        const base64 = await fileToBase64(file);
+        newImages.push(base64);
+      } catch (error) {
+        setUploadError("Failed to process image");
+        hasError = true;
+        break;
+      }
+    }
+
+    if (!hasError && newImages.length > 0) {
       updateCarDetails({
-        images: [...carDetails.images, randomImage],
+        images: [...carDetails.images, ...newImages],
       });
     }
+  };
+
+  const handleImageUpload = () => {
+    fileInputRef.current?.click();
+  };
+
+  const handleFileInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    handleFiles(e.target.files);
   };
 
   const removeImage = (index: number) => {
@@ -116,6 +182,13 @@ const ImagesAndSpecsForm: React.FC<ImagesAndSpecsFormProps> = ({
       setDragActive(false);
     }
   };
+
+  const handleDrop = (e: React.DragEvent) => {
+    handleDrag(e);
+    setDragActive(false);
+    handleFiles(e.dataTransfer.files);
+  };
+
   return (
     <div className="space-y-8 py-4">
       <div>
@@ -130,16 +203,13 @@ const ImagesAndSpecsForm: React.FC<ImagesAndSpecsFormProps> = ({
         </label>
 
         <div
-          className={`border-2 border-dashed rounded-lg p-6 text-center ${
+          className={`border-2 border-dashed rounded-lg p-6 text-center transition-colors ${
             dragActive ? "border-blue-500 bg-blue-50" : "border-gray-300"
           }`}
           onDragEnter={handleDrag}
           onDragLeave={handleDrag}
           onDragOver={handleDrag}
-          onDrop={(e) => {
-            handleDrag(e);
-            handleImageUpload();
-          }}
+          onDrop={handleDrop}
         >
           <Upload className="h-10 w-10 text-gray-400 mx-auto mb-3" />
           <p className="text-gray-600">Drag photos here or</p>
@@ -150,9 +220,21 @@ const ImagesAndSpecsForm: React.FC<ImagesAndSpecsFormProps> = ({
           >
             Browse Files
           </button>
+          <input
+            ref={fileInputRef}
+            type="file"
+            multiple
+            accept="image/jpeg,image/png,image/webp"
+            onChange={handleFileInputChange}
+            className="hidden"
+            aria-label="Upload car images"
+          />
           <p className="text-xs text-gray-500 mt-2">
-            Add up to 10 photos (JPEG or PNG)
+            Add up to {MAX_IMAGES} photos (JPEG, PNG, or WebP - max 5MB each)
           </p>
+          {uploadError && (
+            <p className="text-xs text-red-600 mt-2">{uploadError}</p>
+          )}
         </div>
         {carDetails.images.length > 0 && (
           <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4 mt-4">
@@ -182,7 +264,7 @@ const ImagesAndSpecsForm: React.FC<ImagesAndSpecsFormProps> = ({
                 )}
               </div>
             ))}
-            {carDetails.images.length < 10 && (
+            {carDetails.images.length < MAX_IMAGES && (
               <button
                 type="button"
                 onClick={handleImageUpload}
