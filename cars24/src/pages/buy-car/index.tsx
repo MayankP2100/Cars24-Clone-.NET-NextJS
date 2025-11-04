@@ -78,29 +78,31 @@ const index = () => {
 
 
   return (
-    <div className="bg-gray-100">
-      <div className="text-black max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8bg-white">
+    <div className="bg-gray-100 min-h-screen">
+      <div className="text-black max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
 
         {/* Filters Options */}
-        <div className="flex flex-wrap gap-6">
-          <FiltersPanel
-            priceRange={priceRange as [number, number]}
-            setPriceRange={(v) => setPriceRange(v)}
-            selectedBrands={selectedBrands}
-            setSelectedBrands={setSelectedBrands}
-            city={city}
-            setCity={setCity}
-            selectedFuels={selectedFuels}
-            setSelectedFuels={setSelectedFuels}
-            selectedTransmissions={selectedTransmissions}
-            setSelectedTransmissions={setSelectedTransmissions}
-            yearRange={yearRange}
-            setYearRange={(v) => setYearRange(v)}
-            mileageRange={mileageRange}
-            setMileageRange={(v) => setMileageRange(v)}
-            brandList={brandList}
-            onUseMyLocation={getUserLocation}
-          />
+        <div className="mb-8 pt-4">
+          <div className="flex flex-wrap gap-6">
+            <FiltersPanel
+              priceRange={priceRange as [number, number]}
+              setPriceRange={(v) => setPriceRange(v)}
+              selectedBrands={selectedBrands}
+              setSelectedBrands={setSelectedBrands}
+              city={city}
+              setCity={setCity}
+              selectedFuels={selectedFuels}
+              setSelectedFuels={setSelectedFuels}
+              selectedTransmissions={selectedTransmissions}
+              setSelectedTransmissions={setSelectedTransmissions}
+              yearRange={yearRange}
+              setYearRange={(v) => setYearRange(v)}
+              mileageRange={mileageRange}
+              setMileageRange={(v) => setMileageRange(v)}
+              brandList={brandList}
+              onUseMyLocation={getUserLocation}
+            />
+          </div>
         </div>
 
         <div className="mt-4">
