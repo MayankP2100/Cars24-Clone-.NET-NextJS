@@ -53,7 +53,7 @@ public class PricingController(PricingService pricingService) : ControllerBase
     {
         var adjustment =
             await pricingService.CreatePricingAdjustmentAsync(carId, request.BasePrice, request.City, request.CarTitle,
-                request.YearOfManufacture, request.Condition, request.MileageKm);
+                request.YearOfManufacture, request.MileageKm);
         return CreatedAtAction(nameof(GetPricingAdjustment), new { carId }, adjustment);
     }
 
@@ -95,7 +95,6 @@ public class CreatePricingAdjustmentRequest
     public required string City { get; set; }
     public required string CarTitle { get; set; }
     public required int YearOfManufacture { get; set; }
-    public required string Condition { get; set; }
     public required long MileageKm { get; set; }
 }
 

@@ -8,11 +8,11 @@ public class PricingService
     private readonly IMongoCollection<PricingMultiplier> _pricingMultiplierCollection;
     private readonly IMongoCollection<PricingAdjustment> _pricingAdjustmentCollection;
 
-    private static readonly List<string> ValidIndianCities = new()
-    {
+    private static readonly List<string> ValidIndianCities =
+    [
         "Mumbai", "Delhi", "Bangalore", "Kolkata", "Chennai",
         "Pune", "Hyderabad", "Ahmedabad", "Jaipur", "Surat"
-    };
+    ];
 
     public PricingService(IConfiguration config)
     {
@@ -99,9 +99,9 @@ public class PricingService
     public async Task<PricingMultiplier?> GetPricingMultiplierAsync(string region, string season, string vehicleType)
     {
         return await _pricingMultiplierCollection
-            .Find(x => x.Region.ToLower() == region.ToLower() &&
-                       x.Season.ToLower() == season.ToLower() &&
-                       x.VehicleType.ToLower() == vehicleType.ToLower())
+            .Find(x => x.Region.Equals(region, StringComparison.CurrentCultureIgnoreCase) &&
+                       x.Season.Equals(season, StringComparison.CurrentCultureIgnoreCase) &&
+                       x.VehicleType.Equals(vehicleType, StringComparison.CurrentCultureIgnoreCase))
             .FirstOrDefaultAsync();
     }
 
@@ -134,7 +134,7 @@ public class PricingService
         return Math.Round(recommendedPrice, 2);
     }
 
-    private decimal GetDefaultRegionMultiplier(string region, string vehicleType)
+    private static decimal GetDefaultRegionMultiplier(string region, string vehicleType)
     {
         return (region.ToLower(), vehicleType.ToLower()) switch
         {
@@ -160,7 +160,7 @@ public class PricingService
         };
     }
 
-    private decimal GetDefaultSeasonalMultiplier(string season, string vehicleType)
+    private static decimal GetDefaultSeasonalMultiplier(string season, string vehicleType)
     {
         return (season.ToLower(), vehicleType.ToLower()) switch
         {
@@ -171,6 +171,7 @@ public class PricingService
 
             ("postmonsoon", "suv") => 1.10m,
             ("postmonsoon", "offroad") => 1.15m,
+            ("postmonsoon", "sedan") => 1.08m,
             ("postmonsoon", _) => 1.05m,
 
             ("winter", "suv") => 1.05m,
@@ -179,58 +180,50 @@ public class PricingService
 
             ("summer", "hatchback") => 1.10m,
             ("summer", "suv") => 0.95m,
-            ("summer", _) => 1.0m,
 
             _ => 1.0m
         };
     }
 
-    public decimal GetAgeDepreciationMultiplier(int yearOfManufacture)
+    private static decimal GetAgeDepreciationMultiplier(int yearOfManufacture)
     {
         var age = DateTime.UtcNow.Year - yearOfManufacture;
 
         return age switch
         {
             0 => 1.0m,
-            1 => 0.85m,
-            2 => 0.75m,
-            3 => 0.65m,
-            >= 4 and <= 5 => 0.55m,
-            >= 6 and <= 8 => 0.45m,
-            >= 9 and <= 10 => 0.35m,
-            _ => 0.25m
+            1 => 0.97m,
+            2 => 0.94m,
+            3 => 0.91m,
+            4 => 0.88m,
+            5 => 0.85m,
+            6 => 0.82m,
+            7 => 0.79m,
+            8 => 0.76m,
+            9 => 0.73m,
+            10 => 0.70m,
+            _ => 0.65m
         };
     }
 
-    public decimal GetConditionMultiplier(string condition)
-    {
-        return condition.ToLower() switch
-        {
-            "excellent" => 1.0m,
-            "good" => 0.90m,
-            "fair" => 0.75m,
-            "poor" => 0.60m,
-            _ => 0.85m
-        };
-    }
-
-    public decimal GetMileageMultiplier(long mileageKm)
+    private static decimal GetMileageMultiplier(long mileageKm)
     {
         return mileageKm switch
         {
             <= 50000 => 1.0m,
-            <= 100000 => 0.95m,
-            <= 150000 => 0.85m,
-            <= 200000 => 0.75m,
-            <= 250000 => 0.65m,
-            _ => 0.55m
+            <= 100000 => 0.98m,
+            <= 150000 => 0.95m,
+            <= 200000 => 0.92m,
+            <= 250000 => 0.88m,
+            <= 300000 => 0.83m,
+            _ => 0.75m
         };
     }
 
 
     public async Task<PricingAdjustment> CreatePricingAdjustmentAsync(
         string carId, decimal basePrice, string city, string carTitle,
-        int yearOfManufacture, string condition, long mileageKm)
+        int yearOfManufacture, long mileageKm)
     {
         var vehicleType = InferVehicleTypeFromTitle(carTitle);
         var region = GetRegionTypeByCity(NormalizeCity(city));
@@ -241,10 +234,9 @@ public class PricingService
         var marketAdjustedPrice = basePrice * regionMultiplier * seasonalMultiplier;
 
         var ageMultiplier = GetAgeDepreciationMultiplier(yearOfManufacture);
-        var conditionMultiplier = GetConditionMultiplier(condition);
         var mileageMultiplier = GetMileageMultiplier(mileageKm);
 
-        var recommendedPrice = marketAdjustedPrice * ageMultiplier * conditionMultiplier * mileageMultiplier;
+        var recommendedPrice = marketAdjustedPrice * ageMultiplier * mileageMultiplier;
         recommendedPrice = Math.Round(recommendedPrice, 2);
 
         var priceChange = recommendedPrice - basePrice;

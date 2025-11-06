@@ -163,7 +163,7 @@ const index = () => {
               </div>
 
               {/* Google Maps */}
-              <div className={'flex flex-wrap gap-x-2 gap-y-1'}>
+              <div className={'flex flex-wrap gap-x-2 gap-y-1 mb-4'}>
                 <Button asChild>
                   <Link
                     href={`https://www.google.com/maps/search/${carDetails.title}+service+center+${carDetails.location}`}
