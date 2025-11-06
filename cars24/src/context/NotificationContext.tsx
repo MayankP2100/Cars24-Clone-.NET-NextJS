@@ -1,6 +1,5 @@
-// filepath: src/context/NotificationContext.tsx
 import React, { createContext, useContext, useState, useCallback } from 'react';
-import { Notification, NotificationType } from '@/components/NotificationCenter';
+import { Notification } from '@/components/NotificationCenter';
 
 interface NotificationContextType {
   notifications: Notification[];
@@ -24,7 +23,6 @@ export const NotificationProvider: React.FC<{ children: React.ReactNode }> = ({ 
 
     setNotifications((prev) => [newNotification, ...prev]);
 
-    // auto-remove non-important notifications after 5 seconds
     if (notification.type !== 'appointment' && notification.type !== 'message') {
       setTimeout(() => {
         removeNotification(id);

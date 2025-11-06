@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
 import { Bell, X, Trash2, CheckCircle, AlertCircle, Info, MessageSquare } from 'lucide-react';
-import { Button } from '@/components/ui/button';
 
 export type NotificationType = 'appointment' | 'bid' | 'price_drop' | 'message' | 'info';
 
