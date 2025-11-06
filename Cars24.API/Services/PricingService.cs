@@ -267,9 +267,4 @@ public class PricingService
             .Find(x => x.CarId == carId)
             .FirstOrDefaultAsync();
     }
-
-    public async Task UpdatePricingAdjustmentAsync(string id, PricingAdjustment adjustment)
-    {
-        await _pricingAdjustmentCollection.ReplaceOneAsync(x => x.Id == id, adjustment);
-    }
 }
