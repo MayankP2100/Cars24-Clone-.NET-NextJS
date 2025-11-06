@@ -21,6 +21,7 @@ builder.Services.AddSingleton<BookingService>();
 builder.Services.AddScoped<CarService>();
 builder.Services.AddScoped<ISearchService, SearchService>();
 builder.Services.AddScoped<NotificationPreferenceService>();
+builder.Services.AddScoped<PricingService>();
 
 builder.Services.AddCors(options =>
 {
