@@ -9,8 +9,15 @@ import React, {useEffect, useState} from "react";
 import {toast} from "sonner";
 import Link from "next/link";
 import {Button} from "@/components/ui/button";
+import PricingInsight from "@/components/PricingInsight";
 
 const index = () => {
+  // All hooks must be called at the top level first
+  const router = useRouter();
+  const {id} = router.query;
+  const {user} = useAuth();
+
+  // Then state declarations
   const [formData, setFormData] = useState({
     name: "",
     phone: "",
@@ -22,8 +29,6 @@ const index = () => {
     loanRequired: "no",
     downPayment: "",
   });
-  const router = useRouter();
-  const {id} = router.query;
   const [carDetails, setCarDetails] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [step, setStep] = useState(1);
@@ -66,7 +71,7 @@ const index = () => {
       [name]: value,
     }));
   };
-  const {user} = useAuth();
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!user) {
@@ -259,7 +264,28 @@ const index = () => {
               </div>
             </div>
             {/* booking form  */}
-            <div className="bg-white rounded-lg shadow-md p-6">
+            <div className="space-y-6">
+              {/* Pricing Section */}
+              <div className="bg-white rounded-lg shadow-md p-6">
+                {carDetails && (
+                  <PricingInsight
+                    carId={carDetails.id}
+                    car={{
+                      id: carDetails.id,
+                      title: carDetails.title,
+                      price: carDetails.price,
+                      year: carDetails.specs?.year || 2020,
+                      location: carDetails.location,
+                      specs: {
+                        km: carDetails.specs?.km || 0,
+                      },
+                    }}
+                  />
+                )}
+              </div>
+
+              {/* Booking Form */}
+              <div className="bg-white rounded-lg shadow-md p-6">
               <h2 className="text-2xl font-bold mb-6">
                 Complete Your Purchase
               </h2>
@@ -471,6 +497,7 @@ const index = () => {
                   )}
                 </div>
               </form>
+              </div>
             </div>
           </div>
         </div>

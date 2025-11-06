@@ -4,6 +4,7 @@ import {Heart} from "lucide-react";
 export default function CarCard({car}: { car: any }) {
   const m = car.maintenanceInsights || {};
   const specs = car.specs || {};
+
   return (
     <Link
       key={car.id}
