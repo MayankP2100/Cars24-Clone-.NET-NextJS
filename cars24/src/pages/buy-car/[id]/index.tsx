@@ -12,12 +12,10 @@ import {Button} from "@/components/ui/button";
 import PricingInsight from "@/components/PricingInsight";
 
 const index = () => {
-  // All hooks must be called at the top level first
   const router = useRouter();
   const {id} = router.query;
   const {user} = useAuth();
 
-  // Then state declarations
   const [formData, setFormData] = useState({
     name: "",
     phone: "",
@@ -286,217 +284,217 @@ const index = () => {
 
               {/* Booking Form */}
               <div className="bg-white rounded-lg shadow-md p-6">
-              <h2 className="text-2xl font-bold mb-6">
-                Complete Your Purchase
-              </h2>
+                <h2 className="text-2xl font-bold mb-6">
+                  Complete Your Purchase
+                </h2>
 
-              <div className="mb-6">
-                <div className="flex items-center space-x-4">
-                  {[1, 2, 3].map((stepNumber) => (
-                    <div key={stepNumber} className="flex items-center">
-                      <div
-                        className={`w-8 h-8 rounded-full flex items-center justify-center ${
-                          step === stepNumber
-                            ? "bg-blue-600 text-white"
-                            : step > stepNumber
-                              ? "bg-green-500 text-white"
-                              : "bg-gray-200 text-gray-600"
-                        }`}
-                      >
-                        {step > stepNumber ? "✓" : stepNumber}
-                      </div>
-                      {stepNumber < 3 && (
+                <div className="mb-6">
+                  <div className="flex items-center space-x-4">
+                    {[1, 2, 3].map((stepNumber) => (
+                      <div key={stepNumber} className="flex items-center">
                         <div
-                          className={`w-12 h-1 ${
-                            step > stepNumber ? "bg-green-500" : "bg-gray-200"
+                          className={`w-8 h-8 rounded-full flex items-center justify-center ${
+                            step === stepNumber
+                              ? "bg-blue-600 text-white"
+                              : step > stepNumber
+                                ? "bg-green-500 text-white"
+                                : "bg-gray-200 text-gray-600"
                           }`}
-                        ></div>
-                      )}
-                    </div>
-                  ))}
+                        >
+                          {step > stepNumber ? "✓" : stepNumber}
+                        </div>
+                        {stepNumber < 3 && (
+                          <div
+                            className={`w-12 h-1 ${
+                              step > stepNumber ? "bg-green-500" : "bg-gray-200"
+                            }`}
+                          ></div>
+                        )}
+                      </div>
+                    ))}
+                  </div>
                 </div>
-              </div>
-              <form onSubmit={handleSubmit} className="space-y-6">
-                {step === 1 && (
-                  <div className="space-y-4">
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1">
-                        <User className="w-4 h-4 inline mr-1"/> Full Name
-                      </label>
-                      <input
-                        type="text"
-                        name="name"
-                        value={formData.name}
-                        onChange={handleInputChange}
-                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
-                        required
-                      />
-                    </div>
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1">
-                        <Phone className="w-4 h-4 inline mr-1"/> Phone Number
-                      </label>
-                      <input
-                        type="tel"
-                        name="phone"
-                        value={formData.phone}
-                        onChange={handleInputChange}
-                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
-                        required
-                      />
-                    </div>
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1">
-                        Email Address
-                      </label>
-                      <input
-                        type="email"
-                        name="email"
-                        value={formData.email}
-                        onChange={handleInputChange}
-                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
-                        required
-                      />
-                    </div>
-                  </div>
-                )}
-                {step === 2 && (
-                  <div className="space-y-4">
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1">
-                        <Calendar className="w-4 h-4 inline mr-1"/> Preferred
-                        Visit Date
-                      </label>
-                      <Input
-                        type="date"
-                        name="preferredDate"
-                        value={formData.preferredDate}
-                        onChange={handleInputChange}
-                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
-                        required
-                      />
-                    </div>
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1">
-                        <Clock className="w-4 h-4 inline mr-1"/> Preferred Time
-                      </label>
-                      <select
-                        name="preferredTime"
-                        value={formData.preferredTime}
-                        onChange={handleInputChange}
-                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
-                        required
-                      >
-                        <option value="">Select a time</option>
-                        {availableTimes.map((time) => (
-                          <option key={time} value={time}>
-                            {time}
-                          </option>
-                        ))}
-                      </select>
-                    </div>
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1">
-                        <MapPin className="w-4 h-4 inline mr-1"/> Address
-                      </label>
-                      <input
-                        type="text"
-                        name="address"
-                        value={formData.address}
-                        onChange={handleInputChange}
-                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
-                        required
-                      />
-                    </div>
-                  </div>
-                )}
-                {step === 3 && (
-                  <div className="space-y-4">
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1">
-                        <CreditCard className="w-4 h-4 inline mr-1"/> Payment
-                        Method
-                      </label>
-                      <select
-                        name="paymentMethod"
-                        value={formData.paymentMethod}
-                        onChange={handleInputChange}
-                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
-                        required
-                      >
-                        <option value="">Select payment method</option>
-                        <option value="full">Full Payment</option>
-                        <option value="loan">Car Loan</option>
-                      </select>
-                    </div>
-                    {formData.paymentMethod === "loan" && (
+                <form onSubmit={handleSubmit} className="space-y-6">
+                  {step === 1 && (
+                    <div className="space-y-4">
                       <div>
                         <label className="block text-sm font-medium text-gray-700 mb-1">
-                          Down Payment Amount
+                          <User className="w-4 h-4 inline mr-1"/> Full Name
                         </label>
                         <input
                           type="text"
-                          name="downPayment"
-                          value={formData.downPayment}
+                          name="name"
+                          value={formData.name}
                           onChange={handleInputChange}
-                          placeholder="Enter amount"
                           className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
+                          required
                         />
                       </div>
-                    )}
-
-                    <div className="bg-yellow-50 p-4 rounded-lg">
-                      <div className="flex items-start">
-                        <AlertCircle className="w-5 h-5 text-yellow-600 mt-0.5 mr-2"/>
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                          <Phone className="w-4 h-4 inline mr-1"/> Phone Number
+                        </label>
+                        <input
+                          type="tel"
+                          name="phone"
+                          value={formData.phone}
+                          onChange={handleInputChange}
+                          className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
+                          required
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                          Email Address
+                        </label>
+                        <input
+                          type="email"
+                          name="email"
+                          value={formData.email}
+                          onChange={handleInputChange}
+                          className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
+                          required
+                        />
+                      </div>
+                    </div>
+                  )}
+                  {step === 2 && (
+                    <div className="space-y-4">
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                          <Calendar className="w-4 h-4 inline mr-1"/> Preferred
+                          Visit Date
+                        </label>
+                        <Input
+                          type="date"
+                          name="preferredDate"
+                          value={formData.preferredDate}
+                          onChange={handleInputChange}
+                          className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
+                          required
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                          <Clock className="w-4 h-4 inline mr-1"/> Preferred Time
+                        </label>
+                        <select
+                          name="preferredTime"
+                          value={formData.preferredTime}
+                          onChange={handleInputChange}
+                          className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
+                          required
+                        >
+                          <option value="">Select a time</option>
+                          {availableTimes.map((time) => (
+                            <option key={time} value={time}>
+                              {time}
+                            </option>
+                          ))}
+                        </select>
+                      </div>
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                          <MapPin className="w-4 h-4 inline mr-1"/> Address
+                        </label>
+                        <input
+                          type="text"
+                          name="address"
+                          value={formData.address}
+                          onChange={handleInputChange}
+                          className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
+                          required
+                        />
+                      </div>
+                    </div>
+                  )}
+                  {step === 3 && (
+                    <div className="space-y-4">
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                          <CreditCard className="w-4 h-4 inline mr-1"/> Payment
+                          Method
+                        </label>
+                        <select
+                          name="paymentMethod"
+                          value={formData.paymentMethod}
+                          onChange={handleInputChange}
+                          className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
+                          required
+                        >
+                          <option value="">Select payment method</option>
+                          <option value="full">Full Payment</option>
+                          <option value="loan">Car Loan</option>
+                        </select>
+                      </div>
+                      {formData.paymentMethod === "loan" && (
                         <div>
-                          <h4 className="text-sm font-medium text-yellow-800">
-                            Required Documents
-                          </h4>
-                          <ul className="mt-2 text-sm text-yellow-700 list-disc list-inside">
-                            <li>Valid ID Proof</li>
-                            <li>Address Proof</li>
-                            <li>Income Proof (for loan)</li>
-                            <li>Bank Statements (for loan)</li>
-                          </ul>
+                          <label className="block text-sm font-medium text-gray-700 mb-1">
+                            Down Payment Amount
+                          </label>
+                          <input
+                            type="text"
+                            name="downPayment"
+                            value={formData.downPayment}
+                            onChange={handleInputChange}
+                            placeholder="Enter amount"
+                            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
+                          />
+                        </div>
+                      )}
+
+                      <div className="bg-yellow-50 p-4 rounded-lg">
+                        <div className="flex items-start">
+                          <AlertCircle className="w-5 h-5 text-yellow-600 mt-0.5 mr-2"/>
+                          <div>
+                            <h4 className="text-sm font-medium text-yellow-800">
+                              Required Documents
+                            </h4>
+                            <ul className="mt-2 text-sm text-yellow-700 list-disc list-inside">
+                              <li>Valid ID Proof</li>
+                              <li>Address Proof</li>
+                              <li>Income Proof (for loan)</li>
+                              <li>Bank Statements (for loan)</li>
+                            </ul>
+                          </div>
                         </div>
                       </div>
                     </div>
-                  </div>
-                )}
-                <div className="flex justify-between pt-6">
-                  {step > 1 && (
-                    <button
-                      type="button"
-                      onClick={() => setStep(step - 1)}
-                      className="px-4 py-2 text-gray-600 border border-gray-300 rounded-md hover:bg-gray-50"
-                    >
-                      Back
-                    </button>
                   )}
+                  <div className="flex justify-between pt-6">
+                    {step > 1 && (
+                      <button
+                        type="button"
+                        onClick={() => setStep(step - 1)}
+                        className="px-4 py-2 text-gray-600 border border-gray-300 rounded-md hover:bg-gray-50"
+                      >
+                        Back
+                      </button>
+                    )}
 
-                  {step < 3 ? (
-                    <button
-                      type="button"
-                      onClick={() => validateStep() && setStep(step + 1)}
-                      className={`px-6 py-2 rounded-md text-white ${
-                        validateStep()
-                          ? "bg-blue-600 hover:bg-blue-700"
-                          : "bg-gray-400 cursor-not-allowed"
-                      }`}
-                      disabled={!validateStep()}
-                    >
-                      Continue
-                    </button>
-                  ) : (
-                    <button
-                      type="submit"
-                      className="px-6 py-2 bg-green-600 text-white rounded-md hover:bg-green-700"
-                    >
-                      Complete Purchase
-                    </button>
-                  )}
-                </div>
-              </form>
+                    {step < 3 ? (
+                      <button
+                        type="button"
+                        onClick={() => validateStep() && setStep(step + 1)}
+                        className={`px-6 py-2 rounded-md text-white ${
+                          validateStep()
+                            ? "bg-blue-600 hover:bg-blue-700"
+                            : "bg-gray-400 cursor-not-allowed"
+                        }`}
+                        disabled={!validateStep()}
+                      >
+                        Continue
+                      </button>
+                    ) : (
+                      <button
+                        type="submit"
+                        className="px-6 py-2 bg-green-600 text-white rounded-md hover:bg-green-700"
+                      >
+                        Complete Purchase
+                      </button>
+                    )}
+                  </div>
+                </form>
               </div>
             </div>
           </div>

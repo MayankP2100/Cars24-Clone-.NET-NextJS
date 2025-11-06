@@ -52,15 +52,18 @@ const PricingInsight: React.FC<PricingInsightProps> = ({ carId, car }) => {
       />
 
       {/* Refresh Button */}
-      <div className="flex justify-center">
-        <Button
+      <div className="flex justify-center pt-4">
+        <button
           onClick={() => refetch()}
           disabled={isLoading}
-          className="gap-2 bg-blue-600 text-white hover:bg-blue-700"
+          className="w-full h-14 bg-blue-600 text-white hover:bg-blue-700 disabled:bg-blue-400 rounded-md font-medium transition-colors flex items-center justify-center gap-2"
         >
-          <RefreshCw className={`w-4 h-4 ${isLoading ? 'animate-spin' : ''}`} />
-          Recalculate Price
-        </Button>
+          <div className="w-4 h-4 flex items-center justify-center">
+            {isLoading && <RefreshCw className="w-4 h-4 animate-spin" />}
+            {!isLoading && <RefreshCw className="w-4 h-4" />}
+          </div>
+          <span>{isLoading ? "Recalculating..." : "Recalculate Price"}</span>
+        </button>
       </div>
     </div>
   );
