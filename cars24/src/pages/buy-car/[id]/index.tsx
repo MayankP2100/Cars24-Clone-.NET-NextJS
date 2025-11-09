@@ -3,6 +3,9 @@ import {Input} from "@/components/ui/input";
 import {useAuth} from "@/context/AuthContext";
 import {createBooking} from "@/lib/bookingapi";
 import {getCarById} from "@/lib/carapi";
+import {createPurchase} from "@/lib/purchaseapi";
+import {processFirstTransaction} from "@/lib/referralapi";
+import {useNotifications} from "@/hooks/useNotificationContext";
 import {AlertCircle, Calendar, Clock, CreditCard, MapPin, Phone, User,} from "lucide-react";
 import {useRouter} from "next/router";
 import React, {useEffect, useState} from "react";
@@ -15,6 +18,7 @@ const index = () => {
   const router = useRouter();
   const {id} = router.query;
   const {user} = useAuth();
+  const {sendBookingNotification, sendPurchaseNotification, sendReferralNotification} = useNotifications();
 
   const [formData, setFormData] = useState({
     name: "",
@@ -29,6 +33,7 @@ const index = () => {
   });
   const [carDetails, setCarDetails] = useState<any>(null);
   const [loading, setLoading] = useState(true);
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const [step, setStep] = useState(1);
   useEffect(() => {
     if (!id) return;
@@ -72,11 +77,21 @@ const index = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+
+    if (isSubmitting) {
+      console.log("Already submitting, please wait...");
+      return;
+    }
+
     if (!user) {
       toast.error("Please login to continue");
       return;
     }
+
+    setIsSubmitting(true);
+
     try {
+      // Create booking
       const booking = {
         CarId: id,
         name: formData.name,
@@ -89,12 +104,60 @@ const index = () => {
         loanRequired: formData.loanRequired,
         downPayment: formData.downPayment,
       };
-      const response = await createBooking(user.id, booking);
-      if (response.id) {
-        toast.success("Bookings listed Successfully");
-        await router.push(`/bookings`);
+
+      const bookingResponse = await createBooking(user.id, booking);
+
+      let bookingId = null;
+      if (Array.isArray(bookingResponse) && bookingResponse.length > 0) {
+        bookingId = bookingResponse[0]?.id || bookingResponse[0]?.bookingId || bookingResponse[0]?.Id || bookingResponse[0]?._id;
+      } else if (typeof bookingResponse === 'object' && bookingResponse !== null) {
+        bookingId = bookingResponse?.id || bookingResponse?.bookingId || bookingResponse?.Id || bookingResponse?._id;
       }
+
+      if (!bookingId) {
+        bookingId = `booking_${user.id}_${id}_${Date.now()}`;
+      }
+
+      await sendBookingNotification(carDetails.title || "Car", formData.preferredDate, formData.preferredTime);
+
+      if (carDetails) {
+        const carTitle = carDetails.name || carDetails.title || "Car Purchase";
+        const carPrice = typeof carDetails.price === 'string'
+          ? parseFloat(carDetails.price.replace(/,/g, ''))
+          : carDetails.price || 0;
+
+        const purchaseResponse = await createPurchase(
+          user.id,
+          id as string,
+          carTitle,
+          carPrice,
+          "buy",
+          "completed"
+        );
+
+        const purchaseId = purchaseResponse?.id || purchaseResponse?.purchaseId || purchaseResponse?.Id || purchaseResponse?._id || bookingId;
+
+        await sendPurchaseNotification(carTitle, carPrice.toLocaleString());
+
+        try {
+          await processFirstTransaction(user.id, purchaseId);
+          toast.success("Purchase completed! Referral bonuses awarded if applicable.");
+
+          sendReferralNotification(50, "your first purchase");
+        } catch (referralError) {
+          toast.success("Purchase completed!");
+        }
+      }
+
+      toast.success("Bookings listed Successfully");
+      setTimeout(() => {
+        router.push("/bookings");
+      }, 1000);
     } catch (error) {
+      console.error("Submit error:", error);
+      toast.error(error instanceof Error ? error.message : "Failed to complete purchase");
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -488,9 +551,14 @@ const index = () => {
                     ) : (
                       <button
                         type="submit"
-                        className="px-6 py-2 bg-green-600 text-white rounded-md hover:bg-green-700"
+                        disabled={isSubmitting}
+                        className={`px-6 py-2 rounded-md text-white font-semibold ${
+                          isSubmitting
+                            ? "bg-gray-400 cursor-not-allowed opacity-50"
+                            : "bg-green-600 hover:bg-green-700"
+                        }`}
                       >
-                        Complete Purchase
+                        {isSubmitting ? "Processing..." : "Complete Purchase"}
                       </button>
                     )}
                   </div>

@@ -243,7 +243,7 @@ const index = () => {
                 className="block w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
               />
               <p className="text-xs text-gray-600 mt-2">
-                Enter a referral code to claim bonus points after signup
+                Enter a referral code to earn bonus points on your first purchase
               </p>
             </div>
           )}

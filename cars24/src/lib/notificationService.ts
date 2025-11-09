@@ -1,6 +1,6 @@
 // filepath: src/lib/notificationService.ts
 
-export type NotificationType = 'appointment' | 'bid' | 'price_drop' | 'message';
+export type NotificationType = 'appointment' | 'bid' | 'price_drop' | 'message' | 'purchase' | 'sale' | 'referral' | 'booking';
 
 export interface NotificationPayload {
   userId: string;
@@ -107,6 +107,74 @@ export const sendNewMessageNotification = async (
     title: `New message from ${messageDetails.senderName}`,
     message: messageDetails.preview,
     url: `/messages/${messageDetails.conversationId}`,
+  });
+};
+
+export const sendPurchaseConfirmation = async (
+  userId: string,
+  purchaseDetails: {
+    carTitle: string;
+    price: string;
+    purchaseId: string;
+  }
+) => {
+  return sendNotification({
+    userId,
+    type: 'purchase',
+    title: 'Purchase Confirmed',
+    message: `You successfully purchased ${purchaseDetails.carTitle} for ₹${purchaseDetails.price}`,
+    url: `/purchases`,
+  });
+};
+
+export const sendSaleConfirmation = async (
+  userId: string,
+  saleDetails: {
+    carTitle: string;
+    price: string;
+    purchaseId: string;
+  }
+) => {
+  return sendNotification({
+    userId,
+    type: 'sale',
+    title: 'Sale Confirmed',
+    message: `You successfully sold ${saleDetails.carTitle} for ₹${saleDetails.price}`,
+    url: `/purchases`,
+  });
+};
+
+export const sendReferralBonusNotification = async (
+  userId: string,
+  bonusDetails: {
+    points: number;
+    reason: string;
+  }
+) => {
+  return sendNotification({
+    userId,
+    type: 'referral',
+    title: 'Referral Bonus Earned!',
+    message: `You earned ${bonusDetails.points} points for ${bonusDetails.reason}`,
+    url: `/referrals`,
+  });
+};
+
+export const sendBookingConfirmation = async (
+  userId: string,
+  bookingDetails: {
+    carTitle: string;
+    date: string;
+    time: string;
+    bookingId: string;
+  }
+) => {
+  return sendNotification({
+    userId,
+    type: 'booking',
+    title: 'Booking Confirmed',
+    message: `Your booking for ${bookingDetails.carTitle} on ${bookingDetails.date} at ${bookingDetails.time} is confirmed`,
+    url: `/bookings/${bookingDetails.bookingId}`,
   });
 };
 

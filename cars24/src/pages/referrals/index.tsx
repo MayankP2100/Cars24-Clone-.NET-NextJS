@@ -76,7 +76,8 @@ const Referrals = () => {
   }
 
   return (
-    <div className="container mx-auto p-4 md:p-8 max-w-4xl">
+    <div className="min-h-screen bg-white">
+      <div className="container mx-auto p-4 md:p-8 max-w-4xl">
       {/* Header */}
       <div className="mb-8">
         <h1 className="text-3xl md:text-4xl font-bold text-gray-900 mb-2">
@@ -97,13 +98,13 @@ const Referrals = () => {
       )}
 
       {/* Balance Points Card */}
-      <Card className="mb-8 bg-gradient-to-r from-blue-500 to-blue-600 border-0 text-white p-6 md:p-8">
+      <Card className="mb-8 bg-gradient-to-r from-blue-50 to-indigo-100 border-2 border-blue-200 p-6 md:p-8">
         <div className="flex items-center justify-between">
           <div>
-            <p className="text-blue-100 mb-2">Your Balance Points</p>
-            <p className="text-4xl md:text-5xl font-bold">{balancePoints}</p>
+            <p className="text-blue-600 font-semibold mb-2">Your Balance Points</p>
+            <p className="text-5xl md:text-6xl font-bold text-blue-900">{balancePoints}</p>
           </div>
-          <Coins className="w-16 h-16 opacity-20" />
+          <Coins className="w-16 h-16 text-blue-400 opacity-40" />
         </div>
       </Card>
 
@@ -243,9 +244,7 @@ const Referrals = () => {
                 Friend Signs Up
               </h3>
               <p className="text-gray-600">
-                Your friend uses your code to sign up on Cars24. They receive{" "}
-                <span className="font-bold text-green-600">50 points</span> as a
-                welcome bonus.
+                Your friend uses your code to sign up on Cars24.
               </p>
             </div>
           </div>
@@ -256,14 +255,12 @@ const Referrals = () => {
             </div>
             <div>
               <h3 className="font-semibold text-gray-900 mb-1">
-                First Purchase
+                First Purchase or Sale
               </h3>
               <p className="text-gray-600">
-                When your friend makes their first purchase, both of you receive
-                bonus points. You get{" "}
-                <span className="font-bold text-orange-600">100 points</span> and
-                they get an extra{" "}
-                <span className="font-bold text-orange-600">50 points</span>.
+                When your friend makes their first purchase or sells a car, both of you earn bonus points!{" "}
+                <span className="font-bold text-orange-600">You get 100 points</span> and{" "}
+                <span className="font-bold text-orange-600">they get 50 points</span>.
               </p>
             </div>
           </div>
@@ -298,6 +295,7 @@ const Referrals = () => {
           <p className="text-3xl font-bold text-orange-600">N/A</p>
           <p className="text-sm text-gray-500 mt-2">Coming soon</p>
         </Card>
+      </div>
       </div>
     </div>
   );

@@ -1,9 +1,9 @@
-import React, { useState } from "react";
-import { useAuth } from "@/context/AuthContext";
-import { useReferral } from "@/context/ReferralContext";
-import { Button } from "@/components/ui/button";
-import { Alert, AlertDescription } from "@/components/ui/alert";
-import { AlertCircle, Check, Loader, Gift } from "lucide-react";
+import React, {useState} from "react";
+import {useAuth} from "@/context/AuthContext";
+import {useReferral} from "@/context/ReferralContext";
+import {Button} from "@/components/ui/button";
+import {Alert, AlertDescription} from "@/components/ui/alert";
+import {AlertCircle, Check, Gift, Loader} from "lucide-react";
 import * as api from "@/lib/referralapi";
 
 interface ReferralCodeInputProps {
@@ -13,16 +13,17 @@ interface ReferralCodeInputProps {
 }
 
 const ReferralCodeInput: React.FC<ReferralCodeInputProps> = ({
-  onSuccess,
-  buttonText = "Claim Referral Code",
-  showTitle = true,
-}) => {
-  const { user } = useAuth();
-  const { refreshWalletData } = useReferral();
+                                                               onSuccess,
+                                                               buttonText = "Claim Referral Code",
+                                                               showTitle = true,
+                                                             }) => {
+  const {user} = useAuth();
+  const {balancePoints, fetchWalletData} = useReferral();
   const [referralCode, setReferralCode] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState(false);
+  const [updatedBalance, setUpdatedBalance] = useState<number | null>(null);
 
   const handleClaimCode = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -40,16 +41,24 @@ const ReferralCodeInput: React.FC<ReferralCodeInputProps> = ({
     setLoading(true);
     setError(null);
     setSuccess(false);
+    setUpdatedBalance(null);
 
     try {
+      // Step 1: Claim the referral code
       await api.claimReferralCode(referralCode.trim(), user.id);
+
+      // Step 2: Fetch updated wallet data
+      const wallet = await api.getWallet(user.id);
+
+      // Step 3: Update local state with new balance
+      setUpdatedBalance(wallet.balancePoints);
       setSuccess(true);
       setReferralCode("");
 
-      // Refresh wallet data to show updated balance
-      await refreshWalletData(user.id);
+      // Step 4: Refresh context data
+      await fetchWalletData(user.id);
 
-      // Call onSuccess callback if provided
+      // Step 5: Call onSuccess callback if provided
       if (onSuccess) {
         onSuccess();
       }
@@ -59,6 +68,12 @@ const ReferralCodeInput: React.FC<ReferralCodeInputProps> = ({
     } catch (err) {
       const errorMessage =
         err instanceof Error ? err.message : "Failed to claim referral code";
+
+      console.error("Referral claim error details:", {
+        error: err,
+        message: errorMessage,
+        stack: err instanceof Error ? err.stack : undefined,
+      });
 
       // Parse error messages from API
       if (errorMessage.includes("401") || errorMessage.includes("403")) {
@@ -82,7 +97,7 @@ const ReferralCodeInput: React.FC<ReferralCodeInputProps> = ({
       {showTitle && (
         <div className="mb-4">
           <h3 className="text-lg font-semibold text-gray-900 flex items-center gap-2">
-            <Gift className="text-orange-500" size={20} />
+            <Gift className="text-orange-500" size={20}/>
             Have a Referral Code?
           </h3>
           <p className="text-sm text-gray-600 mt-1">
@@ -93,7 +108,7 @@ const ReferralCodeInput: React.FC<ReferralCodeInputProps> = ({
 
       {error && (
         <Alert className="mb-4 border-red-200 bg-red-50">
-          <AlertCircle className="h-4 w-4 text-red-600" />
+          <AlertCircle className="h-4 w-4 text-red-600"/>
           <AlertDescription className="text-red-800">
             {error}
           </AlertDescription>
@@ -102,9 +117,14 @@ const ReferralCodeInput: React.FC<ReferralCodeInputProps> = ({
 
       {success && (
         <Alert className="mb-4 border-green-200 bg-green-50">
-          <Check className="h-4 w-4 text-green-600" />
+          <Check className="h-4 w-4 text-green-600"/>
           <AlertDescription className="text-green-800">
-            ✓ Referral code claimed successfully! You received bonus points.
+            Referral code claimed successfully! You'll earn bonus points on your first purchase.
+            {updatedBalance !== null && (
+              <div className="mt-2 font-semibold">
+                Current balance: {updatedBalance} points
+              </div>
+            )}
           </AlertDescription>
         </Alert>
       )}
@@ -125,12 +145,12 @@ const ReferralCodeInput: React.FC<ReferralCodeInputProps> = ({
         >
           {loading ? (
             <>
-              <Loader className="mr-2 h-4 w-4 animate-spin" />
+              <Loader className="mr-2 h-4 w-4 animate-spin"/>
               Claiming...
             </>
           ) : success ? (
             <>
-              <Check className="mr-2 h-4 w-4" />
+              <Check className="mr-2 h-4 w-4"/>
               Claimed!
             </>
           ) : (

@@ -12,6 +12,7 @@ import {
   ChevronDown,
   XIcon,
   Gift,
+  ShoppingCart,
 } from "lucide-react";
 import Link from "next/link";
 import {
@@ -70,6 +71,7 @@ const Header = () => {
         </div>
 
         <div className="flex lg:hidden">
+          <NotificationBell />
           <button
             type="button"
             className="-m-2.5 inline-flex items-center justify-center rounded-md p-2.5 text-gray-700"
@@ -207,6 +209,16 @@ const Header = () => {
                     >
                       <Gift className="h-4 w-4" />
                       Referral Program
+                    </Link>
+                  </DropdownMenuItem>
+
+                  <DropdownMenuItem asChild>
+                    <Link
+                      href="/purchases"
+                      className="w-full flex items-center gap-2 text-green-600"
+                    >
+                      <ShoppingCart className="h-4 w-4" />
+                      My Purchases & Sales
                     </Link>
                   </DropdownMenuItem>
 

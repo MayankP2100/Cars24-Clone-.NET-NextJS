@@ -12,12 +12,13 @@ const ReferralClaim = () => {
   const router = useRouter();
   const { code } = router.query;
   const { user } = useAuth();
-  const { refreshWalletData } = useReferral();
+  const { fetchWalletData } = useReferral();
 
   const [loading, setLoading] = useState(false);
   const [claimed, setClaimed] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
+  const [updatedBalance, setUpdatedBalance] = useState<number | null>(null);
 
   const handleClaimCode = async () => {
     if (!code || typeof code !== "string" || !user?.id) {
@@ -28,16 +29,28 @@ const ReferralClaim = () => {
     setLoading(true);
     setError(null);
     setSuccess(null);
+    setUpdatedBalance(null);
 
     try {
+      // Step 1: Claim the referral code
       await api.claimReferralCode(code, user.id);
+
+      // Step 2: Fetch updated wallet data
+      const wallet = await api.getWallet(user.id);
+      setUpdatedBalance(wallet.balancePoints);
+
+      // Step 3: Set success message
       setSuccess(
-        `Referral code claimed successfully! You received 50 bonus points.`
+        `Referral code claimed successfully! You'll earn bonus points on your first purchase.${
+          updatedBalance !== null ? ` Your current balance: ${updatedBalance} points` : ""
+        }`
       );
       setClaimed(true);
-      await refreshWalletData(user.id);
 
-      // Redirect to referrals page after 3 seconds
+      // Step 4: Refresh context data
+      await fetchWalletData(user.id);
+
+      // Step 5: Redirect to referrals page after 3 seconds
       setTimeout(() => {
         router.push("/referrals");
       }, 3000);

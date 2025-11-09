@@ -19,19 +19,43 @@ export interface Wallet {
 }
 
 export const createReferralCode = async (userId: string): Promise<string> => {
-  const res = await fetch(`${BASE_URL}/api/referral?userId=${userId}`, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
-  });
+  try {
+    const res = await fetch(`${BASE_URL}/api/referral/create?userId=${userId}`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ userId }),
+    });
 
-  if (!res.ok) {
-    throw new Error("Failed to create referral code");
+    if (!res.ok) {
+      let errorMessage = `Failed to create referral code: ${res.status} ${res.statusText}`;
+
+      try {
+        const errorData = await res.json();
+        errorMessage = errorData.message || errorData.error || errorMessage;
+      } catch (parseError) {
+        // If JSON parsing fails, just use the status text
+        console.error("Could not parse error response:", parseError);
+      }
+
+      console.error("Create referral code error:", {
+        status: res.status,
+        statusText: res.statusText,
+        message: errorMessage,
+        userId,
+      });
+
+      throw new Error(errorMessage);
+    }
+
+    const data = await res.json();
+    console.log("Referral code created successfully:", data.code);
+    return data.code;
+  } catch (error) {
+    console.error("Create referral code exception:", error);
+    throw error;
   }
-
-  const data = await res.json();
-  return data.code;
 };
 
 export const claimReferralCode = async (
@@ -45,11 +69,20 @@ export const claimReferralCode = async (
       headers: {
         "Content-Type": "application/json",
       },
+      body: JSON.stringify({ code, referredUserId }),
     }
   );
 
   if (!res.ok) {
-    throw new Error("Failed to claim referral code");
+    try {
+      const errorData = await res.json();
+      throw new Error(errorData.message || `Failed to claim referral code: ${res.status}`);
+    } catch (e) {
+      if (e instanceof Error && e.message.includes("Failed to claim")) {
+        throw e;
+      }
+      throw new Error(`Failed to claim referral code: ${res.statusText}`);
+    }
   }
 };
 

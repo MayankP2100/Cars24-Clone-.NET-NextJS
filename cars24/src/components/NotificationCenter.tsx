@@ -1,7 +1,16 @@
-import React, { useState, useEffect } from 'react';
-import { Bell, X, Trash2, CheckCircle, AlertCircle, Info, MessageSquare } from 'lucide-react';
+import React, {useEffect, useState} from 'react';
+import {AlertCircle, Bell, CheckCircle, Gift, Info, MessageSquare, ShoppingCart, Trash2, X} from 'lucide-react';
 
-export type NotificationType = 'appointment' | 'bid' | 'price_drop' | 'message' | 'info';
+export type NotificationType =
+  'appointment'
+  | 'bid'
+  | 'price_drop'
+  | 'message'
+  | 'info'
+  | 'purchase'
+  | 'sale'
+  | 'referral'
+  | 'booking';
 
 export interface Notification {
   id: string;
@@ -24,15 +33,21 @@ interface NotificationCenterProps {
 const getNotificationIcon = (type: NotificationType) => {
   switch (type) {
     case 'appointment':
-      return <CheckCircle className="h-5 w-5 text-green-600" />;
+    case 'booking':
+      return <CheckCircle className="h-5 w-5 text-green-600"/>;
     case 'bid':
-      return <AlertCircle className="h-5 w-5 text-orange-600" />;
+      return <AlertCircle className="h-5 w-5 text-orange-600"/>;
     case 'price_drop':
-      return <AlertCircle className="h-5 w-5 text-red-600" />;
+      return <AlertCircle className="h-5 w-5 text-red-600"/>;
     case 'message':
-      return <MessageSquare className="h-5 w-5 text-blue-600" />;
+      return <MessageSquare className="h-5 w-5 text-blue-600"/>;
+    case 'purchase':
+    case 'sale':
+      return <ShoppingCart className="h-5 w-5 text-blue-600"/>;
+    case 'referral':
+      return <Gift className="h-5 w-5 text-purple-600"/>;
     default:
-      return <Info className="h-5 w-5 text-gray-600" />;
+      return <Info className="h-5 w-5 text-gray-600"/>;
   }
 };
 
@@ -51,17 +66,28 @@ const formatTime = (date: Date) => {
 };
 
 export const NotificationCenter: React.FC<NotificationCenterProps> = ({
-  isOpen,
-  onClose,
-  notifications,
-  onNotificationClick,
-  onDeleteNotification,
-}) => {
+                                                                        isOpen,
+                                                                        onClose,
+                                                                        notifications,
+                                                                        onNotificationClick,
+                                                                        onDeleteNotification,
+                                                                      }) => {
   const [localNotifications, setLocalNotifications] = useState<Notification[]>(notifications);
 
   useEffect(() => {
     setLocalNotifications(notifications);
   }, [notifications]);
+
+  useEffect(() => {
+    if (isOpen) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = 'unset';
+    }
+    return () => {
+      document.body.style.overflow = 'unset';
+    };
+  }, [isOpen]);
 
   const unreadCount = localNotifications.filter((n) => !n.read).length;
 
@@ -85,13 +111,14 @@ export const NotificationCenter: React.FC<NotificationCenterProps> = ({
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-50 bg-white flex flex-col">
+    <div className="fixed inset-0 z-50 bg-white flex flex-col overflow-hidden">
+      {/* ...existing code... */}
       {/* Top Navigation Bar */}
       <div className="border-b border-gray-200 bg-gradient-to-r from-blue-50 to-indigo-50 sticky top-0 z-40">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex items-center justify-between">
           <div className="flex items-center gap-3">
             <div className="bg-blue-600 p-2 rounded-lg">
-              <Bell className="h-6 w-6 text-white" />
+              <Bell className="h-6 w-6 text-white"/>
             </div>
             <div>
               <h1 className="text-2xl font-bold text-gray-900">Notifications</h1>
@@ -104,7 +131,7 @@ export const NotificationCenter: React.FC<NotificationCenterProps> = ({
             onClick={onClose}
             className="p-3 hover:bg-white rounded-lg transition-colors text-gray-500 hover:text-gray-700"
           >
-            <X className="h-6 w-6" />
+            <X className="h-6 w-6"/>
           </button>
         </div>
       </div>
@@ -116,7 +143,7 @@ export const NotificationCenter: React.FC<NotificationCenterProps> = ({
             <div className="flex items-center justify-center min-h-[60vh]">
               <div className="text-center">
                 <div className="bg-gray-200 p-6 rounded-full w-fit mx-auto mb-4">
-                  <Bell className="h-12 w-12 text-gray-400" />
+                  <Bell className="h-12 w-12 text-gray-400"/>
                 </div>
                 <p className="text-xl font-semibold text-gray-900">No notifications yet</p>
                 <p className="text-gray-500 mt-2">Stay tuned for updates</p>
@@ -154,7 +181,7 @@ export const NotificationCenter: React.FC<NotificationCenterProps> = ({
                           className="p-2 hover:bg-red-100 rounded-lg transition-all flex-shrink-0"
                           title="Delete notification"
                         >
-                          <Trash2 className="h-5 w-5 text-red-600" />
+                          <Trash2 className="h-5 w-5 text-red-600"/>
                         </button>
                       </div>
                     </div>

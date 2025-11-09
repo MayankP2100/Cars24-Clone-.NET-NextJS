@@ -108,22 +108,24 @@ const index = () => {
 
           {/* Main Content */}
           <div className="lg:col-span-3">
-            <div className="flex justify-between items-center mb-6">
-              <h1 className="text-2xl font-bold">Used Cars {city === "All" ? "in India" : `in ${city}`}</h1>
-              <div className="flex items-center space-x-4">
-
-                <SearchBar
-                  query={query}
-                  setQuery={setQuery}
-                  suggestions={suggestions}
-                  onSubmit={handleSubmit}
-                />
+            <div className="mb-6">
+              <h1 className="text-2xl md:text-3xl font-bold mb-4">Used
+                Cars {city === "All" ? "in India" : `in ${city}`}</h1>
+              <div className="flex flex-col sm:flex-row items-center gap-3 sm:gap-4">
+                <div className="w-full sm:flex-1">
+                  <SearchBar
+                    query={query}
+                    setQuery={setQuery}
+                    suggestions={suggestions}
+                    onSubmit={handleSubmit}
+                  />
+                </div>
 
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
                     <Button
                       variant="outline"
-                      className="flex items-center text-white"
+                      className="w-full sm:w-auto flex items-center justify-center text-white"
                     >
                       <Sliders className="h-4 w-4 mr-2"/>
                       Sort

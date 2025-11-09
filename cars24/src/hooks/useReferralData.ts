@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { useReferral } from "@/context/ReferralContext";
 import { useAuth } from "@/context/AuthContext";
 

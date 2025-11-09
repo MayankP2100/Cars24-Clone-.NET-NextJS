@@ -6,6 +6,9 @@ import { useRouter } from "next/router";
 import { useAuth } from "@/context/AuthContext";
 import { toast } from "sonner";
 import { createCar } from "@/lib/carapi";
+import { createPurchase } from "@/lib/purchaseapi";
+import { processFirstTransaction } from "@/lib/referralapi";
+import { useNotifications } from "@/hooks/useNotificationContext";
 type CarDetails = {
   id: string;
   title: string;
@@ -66,6 +69,7 @@ const index = () => {
     setCurrentStep((prev) => Math.max(prev - 1, 1));
   };
   const { user } = useAuth();
+  const { sendSaleNotification, sendReferralNotification } = useNotifications();
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!user) {
@@ -75,6 +79,29 @@ const index = () => {
     try {
       const car = await createCar(carDetails);
       if (car?.id) {
+        const salePrice = typeof carDetails.price === 'string'
+          ? parseFloat(carDetails.price.replace(/,/g, ''))
+          : carDetails.price || 0;
+
+        sendSaleNotification(carDetails.title, salePrice.toLocaleString());
+
+        try {
+          await createPurchase(
+            user.id,
+            car.id,
+            carDetails.title,
+            salePrice,
+            "sell",
+            "completed"
+          );
+
+          await processFirstTransaction(user.id, car.id);
+
+          sendReferralNotification(50, "your first sale");
+        } catch (error) {
+          console.error("Error processing sale transaction:", error);
+        }
+
         toast.success("Car listed Successfully");
         router.push(`/book-appointment/${car?.id}`);
       }
