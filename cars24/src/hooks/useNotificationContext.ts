@@ -1,4 +1,3 @@
-import { useContext } from 'react';
 import { useNotificationContext as useContextHook } from '@/context/NotificationContext';
 
 export const useNotifications = () => {
@@ -12,6 +11,7 @@ export const useNotifications = () => {
         title: 'Purchase Confirmed',
         message: `You successfully purchased ${carTitle} for ₹${price}`,
         read: false,
+        timestamp: new Date(),
       });
     },
     sendSaleNotification: (carTitle: string, price: string) => {
@@ -20,6 +20,7 @@ export const useNotifications = () => {
         title: 'Sale Confirmed',
         message: `You successfully sold ${carTitle} for ₹${price}`,
         read: false,
+        timestamp: new Date(),
       });
     },
     sendReferralNotification: (points: number, reason: string) => {
@@ -28,6 +29,7 @@ export const useNotifications = () => {
         title: 'Referral Bonus Earned!',
         message: `You earned ${points} points for ${reason}`,
         read: false,
+        timestamp: new Date(),
       });
     },
     sendBookingNotification: (carTitle: string, date: string, time: string) => {
@@ -36,6 +38,7 @@ export const useNotifications = () => {
         title: 'Booking Confirmed',
         message: `Your booking for ${carTitle} on ${date} at ${time} is confirmed`,
         read: false,
+        timestamp: new Date(),
       });
     },
   };
