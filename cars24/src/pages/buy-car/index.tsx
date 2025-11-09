@@ -125,7 +125,7 @@ const index = () => {
                   <DropdownMenuTrigger asChild>
                     <Button
                       variant="outline"
-                      className="w-full sm:w-auto flex items-center justify-center text-white"
+                      className="w-full sm:w-auto flex items-center justify-center"
                     >
                       <Sliders className="h-4 w-4 mr-2"/>
                       Sort
