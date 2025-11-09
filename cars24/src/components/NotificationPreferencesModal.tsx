@@ -106,6 +106,7 @@ export const NotificationPreferencesModal: React.FC<NotificationPreferencesModal
         referralNotification: preferences.referralNotification,
         bookingNotification: preferences.bookingNotification,
         frequency: preferences.frequency,
+        id: preferences.id || undefined,
       };
 
       let url = `${BASE_URL}/api/notificationpreference`;
@@ -114,7 +115,6 @@ export const NotificationPreferencesModal: React.FC<NotificationPreferencesModal
       if (preferences.id) {
         url = `${BASE_URL}/api/notificationpreference/${preferences.id}`;
         method = 'PUT';
-        requestBody.id = preferences.id;
       }
 
       const response = await fetch(url, {
