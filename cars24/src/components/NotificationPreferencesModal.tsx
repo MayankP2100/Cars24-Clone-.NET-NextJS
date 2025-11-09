@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from 'react';
-import { Bell, Check, AlertCircle, Clock, Gift, ShoppingCart } from 'lucide-react';
+import { AlertCircle, Bell, Check, Clock, Gift, ShoppingCart } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useAuth } from '@/context/AuthContext';
-import {BASE_URL} from "@/lib/utils";
+import { BASE_URL } from "@/lib/utils";
 
 export type NotificationPreferences = {
   id?: string;
@@ -63,11 +63,8 @@ export const NotificationPreferencesModal: React.FC<NotificationPreferencesModal
       const response = await fetch(`${BASE_URL}/api/notificationpreference/user/${user.id}`);
       if (response.ok) {
         const data = await response.json();
-        console.log('Fetched preferences:', data);
         setPreferences(data);
       } else if (response.status === 404) {
-        console.log('No preferences found, creating new ones...');
-        // Create new preferences if they don't exist
         const newPrefs = { ...defaultPreferences, userId: user.id };
         setPreferences(newPrefs);
       } else {
@@ -120,8 +117,6 @@ export const NotificationPreferencesModal: React.FC<NotificationPreferencesModal
         requestBody.id = preferences.id;
       }
 
-      console.log(`${method} request to ${url}:`, requestBody);
-
       const response = await fetch(url, {
         method,
         headers: { 'Content-Type': 'application/json' },
@@ -130,7 +125,6 @@ export const NotificationPreferencesModal: React.FC<NotificationPreferencesModal
 
       if (response.ok) {
         const savedData = await response.json();
-        console.log('Preferences saved successfully:', savedData);
         setPreferences(savedData);
         setSaved(true);
         onSave?.(preferences);
@@ -150,202 +144,248 @@ export const NotificationPreferencesModal: React.FC<NotificationPreferencesModal
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-      <div className="bg-white rounded-lg shadow-lg w-full max-w-md h-screen md:h-auto md:max-h-[90vh] flex flex-col">
-        <div className="p-6 border-b border-gray-200 flex-shrink-0">
+      <div className="bg-white rounded-xl shadow-2xl w-full h-screen md:h-auto md:max-h-[90vh] flex flex-col overflow-hidden">
+        {/* Header */}
+        <div className="p-6 bg-gradient-to-r from-blue-50 to-indigo-50 border-b border-gray-200 flex-shrink-0">
           <div className="flex items-center gap-3">
-            <Bell className="h-6 w-6 text-blue-600" />
-            <h2 className="text-xl md:text-2xl font-bold">Notification Preferences</h2>
+            <div className="bg-blue-600 p-2 rounded-lg">
+              <Bell className="h-5 w-5 text-white" />
+            </div>
+            <div>
+              <h2 className="text-xl font-bold text-gray-900">Notification Preferences</h2>
+              <p className="text-xs text-gray-600 mt-0.5">Manage how you receive updates</p>
+            </div>
           </div>
         </div>
 
-        <div className="flex-1 overflow-y-auto p-6">
+        {/* Content */}
+        <div className="flex-1 overflow-y-auto p-6 space-y-6">
           {isLoading && (
             <div className="text-center py-8">
-              <p className="text-gray-600">Loading preferences...</p>
+              <div className="inline-block">
+                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+              </div>
+              <p className="text-gray-600 mt-3">Loading preferences...</p>
             </div>
           )}
 
           {error && (
-            <div className="bg-red-50 border border-red-200 rounded-lg p-4 mb-6 flex gap-3">
-              <AlertCircle className="h-5 w-5 text-red-600 flex-shrink-0" />
-              <p className="text-sm text-red-600">{error}</p>
+            <div className="bg-red-50 border border-red-200 rounded-lg p-4 flex gap-3">
+              <AlertCircle className="h-5 w-5 text-red-600 flex-shrink-0 mt-0.5" />
+              <p className="text-sm text-red-700">{error}</p>
             </div>
           )}
 
           {!isLoading && (
-            <div className="space-y-3">
-              {/* Master Toggle - Push Notifications */}
-              <div className="border rounded-lg p-4 bg-blue-50">
-                <label className="flex items-center gap-3 cursor-pointer">
-                  <input
-                    type="checkbox"
-                    checked={preferences.pushNotifications}
-                    onChange={() => handleToggle('pushNotifications')}
-                    className="h-4 w-4 rounded border-gray-300"
-                  />
-                  <div>
-                    <span className="font-semibold text-gray-900">Push Notifications</span>
-                    <p className="text-xs text-gray-600">Enable/disable all push notifications</p>
+            <div className="space-y-5">
+              {/* Section 1: Core Notifications */}
+              <div>
+                <h3 className="text-sm font-semibold text-gray-900 uppercase tracking-wide mb-3">Core Notifications</h3>
+                <div className="space-y-2">
+                  {/* Master Toggle - Push Notifications */}
+                  <div className="border border-blue-200 rounded-lg p-4 bg-blue-50/50 hover:bg-blue-50 transition-colors">
+                    <label className="flex items-center gap-3 cursor-pointer">
+                      <input
+                        type="checkbox"
+                        checked={preferences.pushNotifications}
+                        onChange={() => handleToggle('pushNotifications')}
+                        className="h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                      />
+                      <div className="flex-1">
+                        <span className="font-semibold text-gray-900">Push Notifications</span>
+                        <p className="text-xs text-gray-600">Master toggle for all notifications</p>
+                      </div>
+                    </label>
                   </div>
-                </label>
-              </div>
 
-              {/* Appointment Reminder */}
-              <div className="border rounded-lg p-4">
-                <label className="flex items-center gap-3 cursor-pointer">
-                  <input
-                    type="checkbox"
-                    checked={preferences.appointmentReminder}
-                    onChange={() => handleToggle('appointmentReminder')}
-                    className="h-4 w-4 rounded border-gray-300"
-                    disabled={!preferences.pushNotifications}
-                  />
-                  <div>
-                    <span className="font-semibold text-gray-900">Appointment Reminders</span>
-                    <p className="text-xs text-gray-600">Get notified about upcoming appointments</p>
+                  {/* Appointment Reminder */}
+                  <div className="border border-gray-200 rounded-lg p-4 hover:border-gray-300 transition-colors">
+                    <label className="flex items-center gap-3 cursor-pointer">
+                      <input
+                        type="checkbox"
+                        checked={preferences.appointmentReminder}
+                        onChange={() => handleToggle('appointmentReminder')}
+                        className="h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                        disabled={!preferences.pushNotifications}
+                      />
+                      <div className="flex-1">
+                        <span className={`font-semibold ${!preferences.pushNotifications ? 'text-gray-500' : 'text-gray-900'}`}>
+                          Appointment Reminders
+                        </span>
+                        <p className="text-xs text-gray-600">Upcoming bookings and appointments</p>
+                      </div>
+                    </label>
                   </div>
-                </label>
-              </div>
 
-              {/* Price Drop Reminder */}
-              <div className="border rounded-lg p-4">
-                <label className="flex items-center gap-3 cursor-pointer">
-                  <input
-                    type="checkbox"
-                    checked={preferences.priceDropReminder}
-                    onChange={() => handleToggle('priceDropReminder')}
-                    className="h-4 w-4 rounded border-gray-300"
-                    disabled={!preferences.pushNotifications}
-                  />
-                  <div>
-                    <span className="font-semibold text-gray-900">Price Drop Alerts</span>
-                    <p className="text-xs text-gray-600">Get notified when car prices drop</p>
+                  {/* Price Drop Reminder */}
+                  <div className="border border-gray-200 rounded-lg p-4 hover:border-gray-300 transition-colors">
+                    <label className="flex items-center gap-3 cursor-pointer">
+                      <input
+                        type="checkbox"
+                        checked={preferences.priceDropReminder}
+                        onChange={() => handleToggle('priceDropReminder')}
+                        className="h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                        disabled={!preferences.pushNotifications}
+                      />
+                      <div className="flex-1">
+                        <span className={`font-semibold ${!preferences.pushNotifications ? 'text-gray-500' : 'text-gray-900'}`}>
+                          Price Drop Alerts
+                        </span>
+                        <p className="text-xs text-gray-600">When car prices decrease</p>
+                      </div>
+                    </label>
                   </div>
-                </label>
-              </div>
-
-              {/* Purchase Notification */}
-              <div className="border rounded-lg p-4">
-                <label className="flex items-center gap-3 cursor-pointer">
-                  <input
-                    type="checkbox"
-                    checked={preferences.purchaseNotification}
-                    onChange={() => handleToggle('purchaseNotification')}
-                    className="h-4 w-4 rounded border-gray-300"
-                    disabled={!preferences.pushNotifications}
-                  />
-                  <div>
-                    <span className="font-semibold text-gray-900 flex items-center gap-2">
-                      <ShoppingCart className="h-4 w-4" />
-                      Purchase Notifications
-                    </span>
-                    <p className="text-xs text-gray-600">Get notified when you complete a purchase</p>
-                  </div>
-                </label>
-              </div>
-
-              {/* Sale Notification */}
-              <div className="border rounded-lg p-4">
-                <label className="flex items-center gap-3 cursor-pointer">
-                  <input
-                    type="checkbox"
-                    checked={preferences.saleNotification}
-                    onChange={() => handleToggle('saleNotification')}
-                    className="h-4 w-4 rounded border-gray-300"
-                    disabled={!preferences.pushNotifications}
-                  />
-                  <div>
-                    <span className="font-semibold text-gray-900 flex items-center gap-2">
-                      <ShoppingCart className="h-4 w-4" />
-                      Sale Notifications
-                    </span>
-                    <p className="text-xs text-gray-600">Get notified when you list a car for sale</p>
-                  </div>
-                </label>
-              </div>
-
-              {/* Referral Notification */}
-              <div className="border rounded-lg p-4">
-                <label className="flex items-center gap-3 cursor-pointer">
-                  <input
-                    type="checkbox"
-                    checked={preferences.referralNotification}
-                    onChange={() => handleToggle('referralNotification')}
-                    className="h-4 w-4 rounded border-gray-300"
-                    disabled={!preferences.pushNotifications}
-                  />
-                  <div>
-                    <span className="font-semibold text-gray-900 flex items-center gap-2">
-                      <Gift className="h-4 w-4" />
-                      Referral Bonuses
-                    </span>
-                    <p className="text-xs text-gray-600">Get notified about referral rewards and bonuses</p>
-                  </div>
-                </label>
-              </div>
-
-              {/* Booking Notification */}
-              <div className="border rounded-lg p-4">
-                <label className="flex items-center gap-3 cursor-pointer">
-                  <input
-                    type="checkbox"
-                    checked={preferences.bookingNotification}
-                    onChange={() => handleToggle('bookingNotification')}
-                    className="h-4 w-4 rounded border-gray-300"
-                    disabled={!preferences.pushNotifications}
-                  />
-                  <div>
-                    <span className="font-semibold text-gray-900">Booking Confirmations</span>
-                    <p className="text-xs text-gray-600">Get notified when you book a car</p>
-                  </div>
-                </label>
+                </div>
               </div>
 
               {/* Divider */}
-              <div className="border-t my-3"></div>
+              <div className="border-t border-gray-200"></div>
 
-              {/* Notification Frequency */}
-              <div className="border rounded-lg p-4">
-                <div className="mb-3">
-                  <span className="font-semibold text-gray-900 flex items-center gap-2">
-                    <Clock className="h-4 w-4" />
-                    Notification Frequency
-                  </span>
-                  <p className="text-xs text-gray-600 mt-1">How often would you like to receive notifications?</p>
-                </div>
+              {/* Section 2: Transaction Notifications */}
+              <div>
+                <h3 className="text-sm font-semibold text-gray-900 uppercase tracking-wide mb-3">Transactions</h3>
                 <div className="space-y-2">
-                  <label className="flex items-center gap-3 cursor-pointer">
+                  {/* Purchase Notification */}
+                  <div className="border border-gray-200 rounded-lg p-4 hover:border-gray-300 transition-colors">
+                    <label className="flex items-center gap-3 cursor-pointer">
+                      <input
+                        type="checkbox"
+                        checked={preferences.purchaseNotification}
+                        onChange={() => handleToggle('purchaseNotification')}
+                        className="h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                        disabled={!preferences.pushNotifications}
+                      />
+                      <div className="flex-1">
+                        <span className={`font-semibold flex items-center gap-2 ${!preferences.pushNotifications ? 'text-gray-500' : 'text-gray-900'}`}>
+                          <ShoppingCart className="h-4 w-4 text-blue-600" />
+                          Purchase Confirmations
+                        </span>
+                        <p className="text-xs text-gray-600">When you complete a purchase</p>
+                      </div>
+                    </label>
+                  </div>
+
+                  {/* Sale Notification */}
+                  <div className="border border-gray-200 rounded-lg p-4 hover:border-gray-300 transition-colors">
+                    <label className="flex items-center gap-3 cursor-pointer">
+                      <input
+                        type="checkbox"
+                        checked={preferences.saleNotification}
+                        onChange={() => handleToggle('saleNotification')}
+                        className="h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                        disabled={!preferences.pushNotifications}
+                      />
+                      <div className="flex-1">
+                        <span className={`font-semibold flex items-center gap-2 ${!preferences.pushNotifications ? 'text-gray-500' : 'text-gray-900'}`}>
+                          <ShoppingCart className="h-4 w-4 text-green-600" />
+                          Sale Confirmations
+                        </span>
+                        <p className="text-xs text-gray-600">When you list a car for sale</p>
+                      </div>
+                    </label>
+                  </div>
+
+                  {/* Booking Notification */}
+                  <div className="border border-gray-200 rounded-lg p-4 hover:border-gray-300 transition-colors">
+                    <label className="flex items-center gap-3 cursor-pointer">
+                      <input
+                        type="checkbox"
+                        checked={preferences.bookingNotification}
+                        onChange={() => handleToggle('bookingNotification')}
+                        className="h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                        disabled={!preferences.pushNotifications}
+                      />
+                      <div className="flex-1">
+                        <span className={`font-semibold ${!preferences.pushNotifications ? 'text-gray-500' : 'text-gray-900'}`}>
+                          Booking Confirmations
+                        </span>
+                        <p className="text-xs text-gray-600">When you book a car</p>
+                      </div>
+                    </label>
+                  </div>
+                </div>
+              </div>
+
+              {/* Divider */}
+              <div className="border-t border-gray-200"></div>
+
+              {/* Section 3: Rewards */}
+              <div>
+                <h3 className="text-sm font-semibold text-gray-900 uppercase tracking-wide mb-3">Rewards & Bonuses</h3>
+                <div className="space-y-2">
+                  {/* Referral Notification */}
+                  <div className="border border-gray-200 rounded-lg p-4 hover:border-gray-300 transition-colors">
+                    <label className="flex items-center gap-3 cursor-pointer">
+                      <input
+                        type="checkbox"
+                        checked={preferences.referralNotification}
+                        onChange={() => handleToggle('referralNotification')}
+                        className="h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                        disabled={!preferences.pushNotifications}
+                      />
+                      <div className="flex-1">
+                        <span className={`font-semibold flex items-center gap-2 ${!preferences.pushNotifications ? 'text-gray-500' : 'text-gray-900'}`}>
+                          <Gift className="h-4 w-4 text-purple-600" />
+                          Referral Bonuses
+                        </span>
+                        <p className="text-xs text-gray-600">Rewards and referral earnings</p>
+                      </div>
+                    </label>
+                  </div>
+                </div>
+              </div>
+
+              {/* Divider */}
+              <div className="border-t border-gray-200"></div>
+
+              {/* Section 4: Frequency */}
+              <div>
+                <h3 className="text-sm font-semibold text-gray-900 uppercase tracking-wide mb-3 flex items-center gap-2">
+                  <Clock className="h-4 w-4" />
+                  Frequency
+                </h3>
+                <div className="space-y-2">
+                  <label className="flex items-center gap-3 p-3 border border-gray-200 rounded-lg hover:border-gray-300 transition-colors cursor-pointer">
                     <input
                       type="radio"
                       name="frequency"
                       value="Instant"
                       checked={preferences.frequency === 'Instant'}
                       onChange={() => setPreferences(prev => ({ ...prev, frequency: 'Instant' }))}
-                      className="h-4 w-4"
+                      className="h-4 w-4 text-blue-600 focus:ring-blue-500"
                     />
-                    <span className="text-sm text-gray-700">Instant - Get notified immediately</span>
+                    <div>
+                      <span className="font-semibold text-gray-900">Instant</span>
+                      <p className="text-xs text-gray-600">Notifications immediately</p>
+                    </div>
                   </label>
-                  <label className="flex items-center gap-3 cursor-pointer">
+                  <label className="flex items-center gap-3 p-3 border border-gray-200 rounded-lg hover:border-gray-300 transition-colors cursor-pointer">
                     <input
                       type="radio"
                       name="frequency"
                       value="Daily"
                       checked={preferences.frequency === 'Daily'}
                       onChange={() => setPreferences(prev => ({ ...prev, frequency: 'Daily' }))}
-                      className="h-4 w-4"
+                      className="h-4 w-4 text-blue-600 focus:ring-blue-500"
                     />
-                    <span className="text-sm text-gray-700">Daily - Get a daily digest</span>
+                    <div>
+                      <span className="font-semibold text-gray-900">Daily Digest</span>
+                      <p className="text-xs text-gray-600">Once per day summary</p>
+                    </div>
                   </label>
-                  <label className="flex items-center gap-3 cursor-pointer">
+                  <label className="flex items-center gap-3 p-3 border border-gray-200 rounded-lg hover:border-gray-300 transition-colors cursor-pointer">
                     <input
                       type="radio"
                       name="frequency"
                       value="Weekly"
                       checked={preferences.frequency === 'Weekly'}
                       onChange={() => setPreferences(prev => ({ ...prev, frequency: 'Weekly' }))}
-                      className="h-4 w-4"
+                      className="h-4 w-4 text-blue-600 focus:ring-blue-500"
                     />
-                    <span className="text-sm text-gray-700">Weekly - Get a weekly digest</span>
+                    <div>
+                      <span className="font-semibold text-gray-900">Weekly Digest</span>
+                      <p className="text-xs text-gray-600">Once per week summary</p>
+                    </div>
                   </label>
                 </div>
               </div>
@@ -353,19 +393,30 @@ export const NotificationPreferencesModal: React.FC<NotificationPreferencesModal
           )}
         </div>
 
-        <div className="p-6 border-t border-gray-200 flex gap-3 flex-shrink-0">
-          <Button variant="outline" onClick={onClose} className="flex-1" disabled={isSaving}>
+        {/* Footer */}
+        <div className="p-6 border-t border-gray-200 flex gap-3 flex-shrink-0 bg-gray-50">
+          <Button
+            variant="outline"
+            onClick={onClose}
+            className="flex-1"
+            disabled={isSaving}
+          >
             Cancel
           </Button>
           <Button
             onClick={handleSave}
             disabled={isSaving}
-            className="flex-1 flex items-center justify-center gap-2"
+            className="flex-1 flex items-center justify-center gap-2 bg-blue-600 hover:bg-blue-700 text-white"
           >
             {saved ? (
               <>
                 <Check className="h-4 w-4" />
                 Saved
+              </>
+            ) : isSaving ? (
+              <>
+                <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
+                Saving...
               </>
             ) : (
               'Save Preferences'
