@@ -96,7 +96,7 @@ export const NotificationPreferencesModal: React.FC<NotificationPreferencesModal
     setIsSaving(true);
     setError(null);
     try {
-      const requestBody = {
+      const requestBody: any = {
         userId: user.id,
         pushNotifications: preferences.pushNotifications,
         appointmentReminder: preferences.appointmentReminder,
