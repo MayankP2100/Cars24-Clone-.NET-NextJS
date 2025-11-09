@@ -16,14 +16,14 @@ public class ReferralController : ControllerBase
         _walletService = walletService;
     }
 
-    [HttpPost]
+    [HttpPost("create")]
     public async Task<IActionResult> Create([FromQuery] string userId)
     {
         var code = await _referralService.CreateReferralCodeAsync(userId);
         return Ok(new { Code = code });
     }
 
-    [HttpPost]
+    [HttpPost("claim")]
     public async Task<IActionResult> Claim([FromQuery] string code, [FromQuery] string referredUserId)
     {
         var ok = await _referralService.ClaimReferralAsync(code, referredUserId);
@@ -31,21 +31,21 @@ public class ReferralController : ControllerBase
         return Ok();
     }
 
-    [HttpPost]
+    [HttpPost("first-transaction")]
     public async Task<IActionResult> FirstTransaction([FromQuery] string referredUserId, [FromQuery] string referenceId)
     {
         await _referralService.ProcessFirstTransactionAsync(referredUserId, referenceId);
         return Ok();
     }
 
-    [HttpGet]
+    [HttpGet("wallet")]
     public async Task<IActionResult> GetWallet([FromQuery] string userId)
     {
         var wallet = await _walletService.GetWalletAsync(userId);
         return Ok(wallet);
     }
 
-    [HttpPost]
+    [HttpPost("redeem")]
     public async Task<IActionResult> Redeem([FromQuery] string userId, [FromQuery] long points,
         [FromQuery] string referenceId)
     {

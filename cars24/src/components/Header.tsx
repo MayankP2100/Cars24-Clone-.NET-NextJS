@@ -11,6 +11,7 @@ import {
   User,
   ChevronDown,
   XIcon,
+  Gift,
 } from "lucide-react";
 import Link from "next/link";
 import {
@@ -196,6 +197,16 @@ const Header = () => {
                       className="w-full flex items-center gap-2"
                     >
                       Profile Settings
+                    </Link>
+                  </DropdownMenuItem>
+
+                  <DropdownMenuItem asChild>
+                    <Link
+                      href="/referrals"
+                      className="w-full flex items-center gap-2 text-blue-600"
+                    >
+                      <Gift className="h-4 w-4" />
+                      Referral Program
                     </Link>
                   </DropdownMenuItem>
 

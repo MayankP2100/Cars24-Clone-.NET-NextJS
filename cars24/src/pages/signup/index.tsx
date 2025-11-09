@@ -1,9 +1,10 @@
 import { useAuth } from "@/context/AuthContext";
-import { AlertCircle, Lock, Mail, Phone, User } from "lucide-react";
+import { AlertCircle, Lock, Mail, Phone, User, Gift } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/router";
 import React, { useState } from "react";
 import { toast } from "sonner";
+import ReferralCodeInput from "@/components/ReferralCodeInput";
 
 const index = () => {
   const navigate = useRouter();
@@ -13,9 +14,11 @@ const index = () => {
     confirmPassword: "",
     fullName: "",
     phone: "",
+    referralCode: "",
   });
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
+  const [showReferralInput, setShowReferralInput] = useState(true);
   const { signUp } = useAuth();
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -45,7 +48,13 @@ const index = () => {
       });
 
       toast.success("Account created successfully!");
-      navigate.push("/");
+
+      // Navigate to referrals page to claim code if provided
+      if (formData.referralCode.trim()) {
+        navigate.push(`/referral/${formData.referralCode.trim()}`);
+      } else {
+        navigate.push("/");
+      }
     } catch (error) {
       console.error("Sign up error.", error);
       toast.error("Failed to create account. Please try again.");
@@ -216,6 +225,28 @@ const index = () => {
               />
             </div>
           </div>
+
+          {showReferralInput && (
+            <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+              <div className="flex items-center gap-2 mb-3">
+                <Gift className="text-blue-600 h-5 w-5" />
+                <label className="block text-sm font-medium text-gray-700">
+                  Have a Referral Code? (Optional)
+                </label>
+              </div>
+              <input
+                type="text"
+                name="referralCode"
+                value={formData.referralCode}
+                onChange={handleChange}
+                placeholder="Enter referral code (e.g., ABC123XYZ)"
+                className="block w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+              />
+              <p className="text-xs text-gray-600 mt-2">
+                Enter a referral code to claim bonus points after signup
+              </p>
+            </div>
+          )}
 
           <div>
             <button

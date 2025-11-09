@@ -1,5 +1,6 @@
 import {useAuth} from "@/context/AuthContext";
-import {AlertCircle, Bell, Calendar, Car, Check, LogOut, Mail, Settings, User,} from "lucide-react";
+import {useReferral} from "@/context/ReferralContext";
+import {AlertCircle, Bell, Calendar, Car, Check, LogOut, Mail, Settings, User, Coins, Gift,} from "lucide-react";
 import {useRouter} from "next/router";
 import React, {useEffect, useState} from "react";
 import {Button} from "@/components/ui/button";
@@ -14,6 +15,7 @@ type NotificationPreferences = {
 
 const index = () => {
   const {user} = useAuth();
+  const {balancePoints, fetchWalletData} = useReferral();
   const router = useRouter();
   const [preferences, setPreferences] = useState<NotificationPreferences>({
     id: undefined,
@@ -29,6 +31,7 @@ const index = () => {
   useEffect(() => {
     if (user?.id) {
       fetchPreferences();
+      fetchWalletData(user.id);
     }
   }, [user?.id]);
 
@@ -282,6 +285,17 @@ const index = () => {
 
                 {/* Quick Actions */}
                 <div className="space-y-4">
+                  {/* Balance Points Card */}
+                  <div className="bg-gradient-to-r from-orange-500 to-orange-600 rounded-lg p-4 text-white">
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <p className="text-orange-100 text-sm">Balance Points</p>
+                        <p className="text-2xl font-bold">{balancePoints}</p>
+                      </div>
+                      <Coins className="w-10 h-10 opacity-20" />
+                    </div>
+                  </div>
+
                   <h2 className="text-xl font-semibold">Quick Actions</h2>
                   <div className="space-y-2">
                     <button className="w-full flex items-center space-x-2 p-3 text-left rounded-lg hover:bg-gray-50">
@@ -303,6 +317,14 @@ const index = () => {
                     >
                       <Calendar className="w-5 h-5 text-gray-400"/>
                       <span>Appointments</span>
+                    </button>
+
+                    <button
+                      onClick={() => router.push("/referrals")}
+                      className="w-full flex items-center space-x-2 p-3 text-left rounded-lg hover:bg-blue-50 text-blue-600 hover:text-blue-700 font-medium"
+                    >
+                      <Gift className="w-5 h-5"/>
+                      <span>Referral Program</span>
                     </button>
 
                     <button
