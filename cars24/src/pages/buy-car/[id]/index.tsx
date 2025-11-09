@@ -135,7 +135,7 @@ const index = () => {
           "completed"
         );
 
-        const purchaseId = purchaseResponse?.id || purchaseResponse?.purchaseId || purchaseResponse?.Id || purchaseResponse?._id || bookingId;
+        const purchaseId = purchaseResponse?.id || bookingId;
 
         await sendPurchaseNotification(carTitle, carPrice.toLocaleString());
 
