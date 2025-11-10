@@ -1,9 +1,9 @@
 import React from 'react';
 import { TrendingUp, TrendingDown, MapPin, Calendar, AlertCircle, Loader } from 'lucide-react';
-import { PricingAdjustmentResponse } from '@/lib/pricingapi';
+import { CalculatePriceResponse } from '@/lib/pricingapi';
 
 interface PricingDisplayProps {
-  pricing: PricingAdjustmentResponse | null;
+  pricing: CalculatePriceResponse | null;
   isLoading: boolean;
   error: string | null;
   showDetails?: boolean;
@@ -132,12 +132,12 @@ const PricingDisplay: React.FC<PricingDisplayProps> = ({
             <div className="flex items-start gap-2">
               <MapPin className="w-4 h-4 text-blue-600 flex-shrink-0 mt-0.5" />
               <div className="min-w-0">
-                <p className="text-xs text-gray-600">Region Impact</p>
+                <p className="text-xs text-gray-600">Region</p>
                 <p className="text-sm font-semibold text-gray-900">
                   {pricing.region}
                 </p>
                 <p className="text-xs text-blue-600">
-                  {(pricing.regionMultiplier * 100).toFixed(0)}% of base
+                  {pricing.city}
                 </p>
               </div>
             </div>
@@ -146,12 +146,9 @@ const PricingDisplay: React.FC<PricingDisplayProps> = ({
             <div className="flex items-start gap-2">
               <Calendar className="w-4 h-4 text-amber-600 flex-shrink-0 mt-0.5" />
               <div className="min-w-0">
-                <p className="text-xs text-gray-600">Season Impact</p>
+                <p className="text-xs text-gray-600">Season</p>
                 <p className="text-sm font-semibold text-gray-900 capitalize">
-                  {pricing.season.replace(/([A-Z])/g, ' $1').trim()}
-                </p>
-                <p className="text-xs text-amber-600">
-                  {(pricing.seasonalMultiplier * 100).toFixed(0)}% of base
+                  {pricing.season}
                 </p>
               </div>
             </div>
