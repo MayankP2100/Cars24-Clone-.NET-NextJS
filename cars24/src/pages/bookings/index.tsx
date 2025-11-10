@@ -1,28 +1,24 @@
-import React, { useEffect, useState } from "react";
+import React, {useEffect, useState} from "react";
 
 import {
   Calendar,
-  Clock,
-  MapPin,
   Car,
-  FileText,
-  PenTool as Tool,
-  Shield,
-  AlertCircle,
   Check,
-  User,
-  Settings,
-  Fuel,
-  Gauge,
-  Mail,
-  Phone,
-  Landmark,
+  Clock,
   CreditCard,
   DollarSign,
+  Fuel,
+  Gauge,
+  Landmark,
+  Mail,
+  MapPin,
+  Phone,
+  Settings,
+  Shield,
+  User,
 } from "lucide-react";
-import Link from "next/link";
-import { useAuth } from "@/context/AuthContext";
-import { getBookingByUser } from "@/lib/bookingapi";
+import {useAuth} from "@/context/AuthContext";
+import {getBookingByUser} from "@/lib/bookingapi";
 
 const PurchasedCarsPage = () => {
   // keeping this here for reference if we need dummy data
@@ -112,7 +108,7 @@ const PurchasedCarsPage = () => {
         return "bg-gray-500";
     }
   };
-  const { user } = useAuth();
+  const {user} = useAuth();
   const [loading, setLoading] = useState(true);
   const [purchasedCars, setpurchasedCars] = useState<any>(null);
   useEffect(() => {
@@ -120,7 +116,8 @@ const PurchasedCarsPage = () => {
       try {
         if (user) {
           const car = await getBookingByUser(user?.id);
-          setpurchasedCars(car);
+          // Reverse the array so latest bookings appear first
+          setpurchasedCars(Array.isArray(car) ? [...car].reverse() : car);
           console.log(JSON.stringify(car, null, 2));
         }
       } catch (error) {
@@ -135,7 +132,7 @@ const PurchasedCarsPage = () => {
   if (loading) {
     return (
       <div className="flex justify-center items-center min-h-screen">
-        <div className="animate-spin rounded-full h-10 w-10 border-t-2 border-b-2 border-gray-900" />
+        <div className="animate-spin rounded-full h-10 w-10 border-t-2 border-b-2 border-gray-900"/>
       </div>
     );
   }
@@ -164,7 +161,7 @@ const PurchasedCarsPage = () => {
             <div className="flex justify-between items-start">
               <div>
                 <div className="flex items-center mb-2">
-                  <Check className="w-6 h-6 mr-2 text-green-400" />
+                  <Check className="w-6 h-6 mr-2 text-green-400"/>
                   <h1 className="text-2xl font-bold">Booking Confirmed</h1>
                 </div>
                 <p className="text-blue-200 mb-4">
@@ -173,17 +170,17 @@ const PurchasedCarsPage = () => {
 
                 <div className="flex flex-col md:flex-row gap-4">
                   <div className="flex items-center">
-                    <Calendar className="w-5 h-5 mr-2 text-blue-300" />
+                    <Calendar className="w-5 h-5 mr-2 text-blue-300"/>
                     <span>{data.booking.preferredDate}</span>
                   </div>
                   <div className="flex items-center">
-                    <Clock className="w-5 h-5 mr-2 text-blue-300" />
+                    <Clock className="w-5 h-5 mr-2 text-blue-300"/>
                     <span>{data.booking.preferredTime}</span>
                   </div>
                 </div>
               </div>
               <div className="hidden md:flex items-center">
-                <Car className="w-12 h-12 text-blue-300" />
+                <Car className="w-12 h-12 text-blue-300"/>
               </div>
             </div>
           </div>
@@ -231,37 +228,37 @@ const PurchasedCarsPage = () => {
                   </h3>
                   <div className="grid grid-cols-2 md:grid-cols-3 gap-4 mb-4">
                     <div className="flex items-center">
-                      <Calendar className="w-4 h-4 mr-2 text-blue-600" />
+                      <Calendar className="w-4 h-4 mr-2 text-blue-600"/>
                       <span className="text-gray-700">
                         {data.car.specs.year}
                       </span>
                     </div>
                     <div className="flex items-center">
-                      <Gauge className="w-4 h-4 mr-2 text-blue-600" />
+                      <Gauge className="w-4 h-4 mr-2 text-blue-600"/>
                       <span className="text-gray-700">
                         {data.car.specs.km} km
                       </span>
                     </div>
                     <div className="flex items-center">
-                      <Fuel className="w-4 h-4 mr-2 text-blue-600" />
+                      <Fuel className="w-4 h-4 mr-2 text-blue-600"/>
                       <span className="text-gray-700">
                         {data.car.specs.fuel}
                       </span>
                     </div>
                     <div className="flex items-center">
-                      <Settings className="w-4 h-4 mr-2 text-blue-600" />
+                      <Settings className="w-4 h-4 mr-2 text-blue-600"/>
                       <span className="text-gray-700">
                         {data.car.specs.transmission}
                       </span>
                     </div>
                     <div className="flex items-center">
-                      <User className="w-4 h-4 mr-2 text-blue-600" />
+                      <User className="w-4 h-4 mr-2 text-blue-600"/>
                       <span className="text-gray-700">
                         {data.car.specs.owner}
                       </span>
                     </div>
                     <div className="flex items-center">
-                      <Shield className="w-4 h-4 mr-2 text-blue-600" />
+                      <Shield className="w-4 h-4 mr-2 text-blue-600"/>
                       <span className="text-gray-700">
                         {data.car.specs.insurance}
                       </span>
@@ -294,14 +291,14 @@ const PurchasedCarsPage = () => {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div className="bg-white p-6 rounded-lg shadow-md mb-6">
                 <h2 className="text-xl font-bold text-gray-800 mb-4 flex items-center">
-                  <User className="w-5 h-5 mr-2 text-blue-600" />
+                  <User className="w-5 h-5 mr-2 text-blue-600"/>
                   Customer Details
                 </h2>
 
                 <div className="space-y-3">
                   <div className="flex items-start">
                     <div className="w-8 flex-shrink-0 text-gray-500">
-                      <User className="w-4 h-4" />
+                      <User className="w-4 h-4"/>
                     </div>
                     <div>
                       <p className="text-sm text-gray-500">Name</p>
@@ -313,7 +310,7 @@ const PurchasedCarsPage = () => {
 
                   <div className="flex items-start">
                     <div className="w-8 flex-shrink-0 text-gray-500">
-                      <Phone className="w-4 h-4" />
+                      <Phone className="w-4 h-4"/>
                     </div>
                     <div>
                       <p className="text-sm text-gray-500">Phone</p>
@@ -325,7 +322,7 @@ const PurchasedCarsPage = () => {
 
                   <div className="flex items-start">
                     <div className="w-8 flex-shrink-0 text-gray-500">
-                      <Mail className="w-4 h-4" />
+                      <Mail className="w-4 h-4"/>
                     </div>
                     <div>
                       <p className="text-sm text-gray-500">Email</p>
@@ -337,7 +334,7 @@ const PurchasedCarsPage = () => {
 
                   <div className="flex items-start">
                     <div className="w-8 flex-shrink-0 text-gray-500">
-                      <MapPin className="w-4 h-4" />
+                      <MapPin className="w-4 h-4"/>
                     </div>
                     <div>
                       <p className="text-sm text-gray-500">Address</p>
@@ -350,7 +347,7 @@ const PurchasedCarsPage = () => {
               </div>
               <div className="bg-white p-6 rounded-lg shadow-md mb-6">
                 <h2 className="text-xl font-bold text-gray-800 mb-4 flex items-center">
-                  <DollarSign className="w-5 h-5 mr-2 text-blue-600" />
+                  <DollarSign className="w-5 h-5 mr-2 text-blue-600"/>
                   Payment Details
                 </h2>
 
@@ -385,7 +382,7 @@ const PurchasedCarsPage = () => {
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div className="flex items-center bg-blue-50 p-3 rounded-lg">
-                    <CreditCard className="w-5 h-5 mr-3 text-blue-600" />
+                    <CreditCard className="w-5 h-5 mr-3 text-blue-600"/>
                     <div>
                       <p className="text-sm text-gray-500">Payment Method</p>
                       <p className="text-gray-800 font-medium">
@@ -395,7 +392,7 @@ const PurchasedCarsPage = () => {
                   </div>
 
                   <div className="flex items-center bg-blue-50 p-3 rounded-lg">
-                    <Landmark className="w-5 h-5 mr-3 text-blue-600" />
+                    <Landmark className="w-5 h-5 mr-3 text-blue-600"/>
                     <div>
                       <p className="text-sm text-gray-500">Financing</p>
                       <p className="text-gray-800 font-medium">

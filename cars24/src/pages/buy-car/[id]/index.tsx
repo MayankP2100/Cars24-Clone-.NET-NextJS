@@ -5,14 +5,16 @@ import {createBooking} from "@/lib/bookingapi";
 import {getCarById} from "@/lib/carapi";
 import {createPurchase} from "@/lib/purchaseapi";
 import {processFirstTransaction} from "@/lib/referralapi";
+import {applyPointsToPurchase} from "@/lib/pointsapi";
 import {useNotifications} from "@/hooks/useNotificationContext";
-import {AlertCircle, Calendar, Clock, CreditCard, MapPin, Phone, User,} from "lucide-react";
+import {AlertCircle, Calendar, Clock, CreditCard, MapPin, Phone, User, Gift,} from "lucide-react";
 import {useRouter} from "next/router";
 import React, {useEffect, useState} from "react";
 import {toast} from "sonner";
 import Link from "next/link";
 import {Button} from "@/components/ui/button";
 import PricingInsight from "@/components/PricingInsight";
+import ApplyPoints from "@/components/ApplyPoints";
 
 const index = () => {
   const router = useRouter();
@@ -35,6 +37,9 @@ const index = () => {
   const [loading, setLoading] = useState(true);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [step, setStep] = useState(1);
+  const [finalPrice, setFinalPrice] = useState<number>(0);
+  const [pointsUsed, setPointsUsed] = useState<number>(0);
+  const [showPointsSection, setShowPointsSection] = useState(false);
   useEffect(() => {
     if (!id) return;
 
@@ -42,6 +47,10 @@ const index = () => {
       try {
         const data = await getCarById(id as string);
         setCarDetails(data);
+        const carPrice = typeof data.price === 'string'
+          ? parseFloat(data.price.replace(/,/g, ''))
+          : data.price || 0;
+        setFinalPrice(carPrice);
       } catch (error) {
         console.error(error);
       } finally {
@@ -122,22 +131,30 @@ const index = () => {
 
       if (carDetails) {
         const carTitle = carDetails.name || carDetails.title || "Car Purchase";
-        const carPrice = typeof carDetails.price === 'string'
-          ? parseFloat(carDetails.price.replace(/,/g, ''))
-          : carDetails.price || 0;
 
         const purchaseResponse = await createPurchase(
           user.id,
           id as string,
           carTitle,
-          carPrice,
+          finalPrice,
           "buy",
           "completed"
         );
 
         const purchaseId = purchaseResponse?.id || bookingId;
 
-        await sendPurchaseNotification(carTitle, carPrice.toLocaleString());
+        await sendPurchaseNotification(carTitle, finalPrice.toLocaleString());
+
+        // Consume points after successful purchase
+        if (pointsUsed > 0) {
+          try {
+            await applyPointsToPurchase(user.id, finalPrice, pointsUsed);
+            console.log(`Successfully consumed ${pointsUsed} points`);
+          } catch (pointsError) {
+            console.error("Error consuming points:", pointsError);
+            // Don't fail the purchase if points consumption fails
+          }
+        }
 
         try {
           await processFirstTransaction(user.id, purchaseId);
@@ -473,10 +490,84 @@ const index = () => {
                   )}
                   {step === 3 && (
                     <div className="space-y-4">
+                      {/* Points Discount Section */}
+                      {user && (
+                        <>
+                          <div className="bg-gradient-to-r from-blue-50 to-purple-50 p-4 rounded-lg border border-blue-200">
+                            <button
+                              type="button"
+                              onClick={() => setShowPointsSection(!showPointsSection)}
+                              className="w-full flex items-center justify-between"
+                            >
+                              <div className="flex items-center gap-2">
+                                <Gift className="w-5 h-5 text-blue-600"/>
+                                <span className="font-semibold text-gray-800">Apply Points Discount</span>
+                              </div>
+                              <span className="text-sm text-gray-600">{showPointsSection ? '▼' : '▶'}</span>
+                            </button>
+
+                            {showPointsSection && (
+                              <div className="mt-4 pt-4 border-t border-blue-200">
+                                <ApplyPoints
+                                  userId={user.id}
+                                  purchasePrice={finalPrice}
+                                  onPointsApplied={(final, used) => {
+                                    if (typeof final !== 'number' || typeof used !== 'number') {
+                                      toast.error('Invalid points response. Please try again.');
+                                      return;
+                                    }
+                                    const originalPrice = typeof carDetails.price === 'string'
+                                      ? parseFloat(carDetails.price.replace(/,/g, ''))
+                                      : carDetails.price || 0;
+                                    const savings = originalPrice - final;
+                                    setFinalPrice(final);
+                                    setPointsUsed(used);
+                                    if (savings > 0) {
+                                      toast.success(`Applied ${used} points - Saved ₹${savings.toLocaleString()}`);
+                                    }
+                                  }}
+                                />
+                              </div>
+                            )}
+                          </div>
+
+                          {/* Price Summary */}
+                          <div className="bg-blue-50 p-4 rounded-lg">
+                            <div className="space-y-2">
+                              {(() => {
+                                const originalPrice = typeof carDetails.price === 'string'
+                                  ? parseFloat(carDetails.price.replace(/,/g, ''))
+                                  : carDetails.price || 0;
+                                const discount = Math.max(0, originalPrice - finalPrice);
+
+                                return (
+                                  <>
+                                    <div className="flex justify-between">
+                                      <span className="text-gray-700">Original Price:</span>
+                                      <span className="font-semibold">₹{originalPrice.toLocaleString()}</span>
+                                    </div>
+                                    {pointsUsed > 0 && discount > 0 && (
+                                      <div className="flex justify-between text-green-600">
+                                        <span>Points Discount:</span>
+                                        <span>-₹{discount.toLocaleString()}</span>
+                                      </div>
+                                    )}
+                                    <div className="border-t border-blue-200 pt-2 flex justify-between font-bold text-lg">
+                                      <span>Final Price:</span>
+                                      <span className="text-blue-600">₹{(finalPrice || originalPrice).toLocaleString()}</span>
+                                    </div>
+                                  </>
+                                );
+                              })()}
+                            </div>
+                          </div>
+                        </>
+                      )}
+
+                      {/* Payment Method */}
                       <div>
                         <label className="block text-sm font-medium text-gray-700 mb-1">
-                          <CreditCard className="w-4 h-4 inline mr-1"/> Payment
-                          Method
+                          <CreditCard className="w-4 h-4 inline mr-1"/> Payment Method
                         </label>
                         <select
                           name="paymentMethod"
