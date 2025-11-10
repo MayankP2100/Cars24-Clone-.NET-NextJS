@@ -24,6 +24,7 @@ builder.Services.AddScoped<NotificationPreferenceService>();
 builder.Services.AddScoped<PricingService>();
 builder.Services.AddScoped<ReferralService>();
 builder.Services.AddScoped<WalletService>();
+builder.Services.AddScoped<PointsService>();
 builder.Services.AddScoped<PurchaseService>();
 
 builder.Services.AddCors(options =>

@@ -6,7 +6,7 @@ namespace Cars24.API.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
-public class PricingController(PricingService pricingService) : ControllerBase
+public class PricingController(PricingService pricingService, PointsService pointsService) : ControllerBase
 {
     [HttpGet("multipliers")]
     public async Task<IActionResult> GetAllMultipliers()
@@ -87,6 +87,29 @@ public class PricingController(PricingService pricingService) : ControllerBase
             percentageChange = Math.Round(((recommendedPrice - request.BasePrice) / request.BasePrice) * 100, 2)
         });
     }
+
+    [HttpPost("calculate-with-points")]
+    public async Task<IActionResult> CalculatePriceWithPoints([FromBody] CalculatePriceWithPointsRequest request)
+    {
+        var vehicleType = pricingService.InferVehicleTypeFromTitle(request.CarTitle);
+        var region = pricingService.GetRegionTypeByCity(pricingService.NormalizeCity(request.City));
+        var season = pricingService.GetCurrentSeason();
+        var recommendedPrice = pricingService.CalculateRecommendedPrice(request.BasePrice, region, season, vehicleType);
+
+        var (finalPrice, pointsUsed) = await pointsService.ApplyPointsToPriceAsync(request.UserId, recommendedPrice,
+            request.MaxPointsToUse ?? long.MaxValue);
+        var remainingBalance = await pointsService.GetBalanceAsync(request.UserId);
+
+        return Ok(new
+        {
+            basePrice = request.BasePrice,
+            recommendedPrice = recommendedPrice,
+            finalPrice = finalPrice,
+            pointsUsed = pointsUsed,
+            remainingBalance = remainingBalance,
+            savings = recommendedPrice - finalPrice
+        });
+    }
 }
 
 public class CreatePricingAdjustmentRequest
@@ -103,4 +126,13 @@ public class CalculatePriceRequest
     public required decimal BasePrice { get; set; }
     public required string City { get; set; }
     public required string CarTitle { get; set; }
+}
+
+public class CalculatePriceWithPointsRequest
+{
+    public required string UserId { get; set; }
+    public required decimal BasePrice { get; set; }
+    public required string City { get; set; }
+    public required string CarTitle { get; set; }
+    public long? MaxPointsToUse { get; set; }
 }
