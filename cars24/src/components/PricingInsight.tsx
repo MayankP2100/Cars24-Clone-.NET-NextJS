@@ -1,8 +1,9 @@
-import React from 'react';
-import { usePricingAdjustment } from '@/hooks/usePricingAdjustment';
+import React, { useEffect } from 'react';
+import { usePricing } from '@/hooks/usePricing';
+import { CalculatePriceRequest } from '@/lib/pricingapi';
 import PricingDisplay from '@/components/PricingDisplay';
 import { RefreshCw } from 'lucide-react';
-import { Button } from '@/components/ui/button';
+import { useState } from 'react';
 
 interface PricingInsightProps {
   carId: string;
@@ -18,27 +19,28 @@ interface PricingInsightProps {
   };
 }
 
-/**
- * Component to show detailed pricing insights for a car
- */
 const PricingInsight: React.FC<PricingInsightProps> = ({ carId, car }) => {
+  const { loading: isLoading, error, calculatePrice } = usePricing();
+  const [pricing, setPricing] = useState<any>(null);
+
   // Extract and validate data - strip commas from formatted numbers
   const basePrice = Number(String(car.price).replace(/,/g, ''));
-  const year = Number(car.year);
-  const km = Number(String(car.specs?.km || 0).replace(/,/g, ''));
 
-  const { pricing, isLoading, error, refetch } = usePricingAdjustment({
-    carId,
-    request: {
-      basePrice: basePrice,
-      city: (car.location || 'Mumbai').trim(),
-      carTitle: (car.title || 'Car').trim(),
-      yearOfManufacture: year,
-      condition: 'good',
-      mileageKm: km,
-    },
-    autoCalculate: true,
-  });
+  const calculatePricing = async () => {
+    const request: CalculatePriceRequest = {
+      BasePrice: basePrice,
+      City: (car.location || 'Mumbai').trim(),
+      CarTitle: (car.title || 'Car').trim(),
+    };
+    const result = await calculatePrice(request);
+    if (result) {
+      setPricing(result);
+    }
+  };
+
+  useEffect(() => {
+    calculatePricing();
+  }, [carId]);
 
   return (
     <div className="space-y-6">
@@ -54,7 +56,7 @@ const PricingInsight: React.FC<PricingInsightProps> = ({ carId, car }) => {
       {/* Refresh Button */}
       <div className="flex justify-center pt-4">
         <button
-          onClick={() => refetch()}
+          onClick={() => calculatePricing()}
           disabled={isLoading}
           className="w-full h-14 bg-blue-600 text-white hover:bg-blue-700 disabled:bg-blue-400 rounded-md font-medium transition-colors flex items-center justify-center gap-2"
         >
