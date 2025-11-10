@@ -71,7 +71,14 @@ export const usePricingAdjustment = ({
     setIsLoading(true);
     setError(null);
     try {
-      const result = await calculatePricingAdjustment(carId, request);
+      const adjustmentRequest = {
+        BasePrice: Number(request.basePrice),
+        City: request.city,
+        CarTitle: request.carTitle,
+        YearOfManufacture: request.yearOfManufacture,
+        MileageKm: request.mileageKm,
+      };
+      const result = await calculatePricingAdjustment(carId, adjustmentRequest);
       setPricing(result);
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : 'Failed to calculate pricing';
